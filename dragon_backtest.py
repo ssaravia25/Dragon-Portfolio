@@ -490,6 +490,28 @@ for sp_name, sp_start, sp_end in STRESS_PERIODS:
     })
 
 # ═══════════════════════════════════════════════════════════════════
+# 8c. YTD PER-ASSET RETURNS (base 0%)
+# ═══════════════════════════════════════════════════════════════════
+ytd_start_idx = None
+for i, d in enumerate(dates):
+    if d.year == TODAY.year:
+        ytd_start_idx = i
+        break
+
+ytd_data = {}
+ytd_dates = []
+ytd_dragon = np.array([0.0])
+if ytd_start_idx is not None:
+    ytd_dates = dates[ytd_start_idx:]
+    for t in ALL_TICKERS:
+        p = price_data[t]
+        base = p[ytd_start_idx]
+        if not np.isnan(base) and base > 0:
+            ytd_data[t] = ((p[ytd_start_idx:] / base) - 1) * 100
+    dragon_base = nav_dragon[ytd_start_idx]
+    ytd_dragon = ((nav_dragon[ytd_start_idx:] / dragon_base) - 1) * 100
+
+# ═══════════════════════════════════════════════════════════════════
 # 9. SVG CHART GENERATORS
 # ═══════════════════════════════════════════════════════════════════
 print("\nGenerating charts...")
@@ -634,6 +656,89 @@ def build_correlation_heatmap():
             rows += f'<td class="corr-cell" style="background:{bg};color:{clr}">{v:.2f}</td>'
         rows += "</tr>"
     return f'<table class="corr-table">{rows}</table>'
+
+def build_ytd_chart():
+    if not ytd_data or len(ytd_dates) < 2:
+        return ''
+    vw, vh = 720, 420
+    ml, mr, mt, mb = 50, 90, 15, 30
+    pw, ph = vw - ml - mr, vh - mt - mb
+    n_pts = len(ytd_dates)
+    all_vals = [0.0]
+    for t in ytd_data:
+        valid = ytd_data[t][~np.isnan(ytd_data[t])]
+        if len(valid) > 0:
+            all_vals.extend([float(np.min(valid)), float(np.max(valid))])
+    all_vals.extend([float(np.min(ytd_dragon)), float(np.max(ytd_dragon))])
+    y_min_raw, y_max_raw = min(all_vals), max(all_vals)
+    pad = max(abs(y_max_raw - y_min_raw) * 0.08, 2)
+    y_min, y_max = y_min_raw - pad, y_max_raw + pad
+    y_range = y_max - y_min if y_max > y_min else 1
+    svg = ""
+    # Y grid
+    span = y_max_raw - y_min_raw
+    step = 2 if span < 15 else 5 if span < 40 else 10 if span < 80 else 20
+    pct = int(math.floor(y_min / step)) * step
+    while pct <= y_max + step:
+        yp = mt + ph - ((pct - y_min) / y_range) * ph
+        if yp < mt - 5 or yp > vh - mb + 5:
+            pct += step
+            continue
+        w, op = ("1", "0.3") if pct == 0 else ("0.5", "0.12")
+        svg += f'<line x1="{ml}" y1="{yp:.0f}" x2="{vw-mr}" y2="{yp:.0f}" stroke="rgba(148,163,184,{op})" stroke-width="{w}"/>'
+        svg += f'<text x="{ml-5}" y="{yp:.0f}" text-anchor="end" fill="#64748b" font-size="8" dominant-baseline="middle">{pct:+.0f}%</text>'
+        pct += step
+    # X axis months
+    month_names = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+    seen = set()
+    for i, d in enumerate(ytd_dates):
+        if d.month not in seen:
+            seen.add(d.month)
+            x = ml + (i / max(n_pts - 1, 1)) * pw
+            svg += f'<text x="{x:.0f}" y="{vh-5}" text-anchor="middle" fill="#64748b" font-size="8">{month_names[d.month-1]}</text>'
+            svg += f'<line x1="{x:.0f}" y1="{mt}" x2="{x:.0f}" y2="{vh-mb}" stroke="rgba(148,163,184,0.06)" stroke-width="0.5"/>'
+    # End values
+    end_vals = {}
+    for t in ALL_TICKERS:
+        if t not in ytd_data: continue
+        vals = ytd_data[t]
+        for v in reversed(vals):
+            if not np.isnan(v):
+                end_vals[t] = float(v)
+                break
+    # Draw asset lines
+    for t in end_vals:
+        vals = ytd_data[t]
+        color = TICKER_COLORS.get(t, "#94a3b8")
+        pts = []
+        for i in range(len(vals)):
+            if not np.isnan(vals[i]):
+                x = ml + (i / max(n_pts - 1, 1)) * pw
+                y = mt + ph - ((vals[i] - y_min) / y_range) * ph
+                pts.append(f"{x:.1f},{y:.1f}")
+        if pts:
+            svg += f'<polyline points="{" ".join(pts)}" fill="none" stroke="{color}" stroke-width="1.3" stroke-linejoin="round" opacity="0.6"/>'
+    # Dragon line (thick)
+    pts = []
+    for i in range(len(ytd_dragon)):
+        x = ml + (i / max(n_pts - 1, 1)) * pw
+        y = mt + ph - ((ytd_dragon[i] - y_min) / y_range) * ph
+        pts.append(f"{x:.1f},{y:.1f}")
+    svg += f'<polyline points="{" ".join(pts)}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linejoin="round"/>'
+    # End labels (anti-overlap)
+    all_labels = [(t, end_vals[t], TICKER_COLORS.get(t, "#94a3b8"), "7", "600") for t in end_vals]
+    all_labels.append(("Dragon", float(ytd_dragon[-1]), "#fbbf24", "8", "800"))
+    all_labels.sort(key=lambda x: -x[1])
+    placed = []
+    for name, val, color, fsize, fweight in all_labels:
+        target_y = mt + ph - ((val - y_min) / y_range) * ph
+        final_y = target_y
+        for py in placed:
+            if abs(final_y - py) < 9:
+                final_y = py + 9
+        placed.append(final_y)
+        svg += f'<text x="{vw-mr+4}" y="{final_y:.0f}" fill="{color}" font-size="{fsize}" font-weight="{fweight}" dominant-baseline="middle">{name} {val:+.1f}%</text>'
+    return f'<svg viewBox="0 0 {vw} {vh}" xmlns="http://www.w3.org/2000/svg">{svg}</svg>'
 
 # ═══════════════════════════════════════════════════════════════════
 # 10. HELPER FORMATTERS
@@ -1013,6 +1118,16 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
       <p style="margin-top:6px"><strong style="color:#e2e8f0">Cmdty Trend (18%)</strong> — DBC + SMA-50.</p>
       <p style="margin-top:6px"><strong style="color:#e2e8f0">60/40 Benchmark</strong> — SPY + TLT fijo.</p>
       <p style="margin-top:6px"><strong style="color:#e2e8f0">Rf</strong> — {RF_ANNUAL*100:.1f}%.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Evolutivo YTD {TODAY.year} — Todos los Activos (Base 0%)</div>
+    <div class="chart-container">{build_ytd_chart()}</div>
+    <div style="margin-top:8px;font-size:8px;color:#475569">
+      Retorno acumulado desde el 1 de enero {TODAY.year}. Cada linea representa un activo individual del universo.
+      <span style="color:#fbbf24;font-weight:700">Linea dorada = Dragon Portfolio v2.</span>
+      Etiquetas a la derecha muestran el retorno YTD actual.
     </div>
   </div>
 
