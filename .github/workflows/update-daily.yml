@@ -43,14 +43,11 @@ jobs:
       - name: Run dragon_alternatives.py
         run: python dragon_alternatives.py
 
-      - name: Run dragon_live.py
-        run: python dragon_live.py
-
       - name: Commit updated reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Dragon_Portfolio_Backtest.html Dragon_SMA200_Backtest.html Dragon_Alternativas.html Dragon_Live.html
+          git add Dragon_Portfolio_Backtest.html Dragon_SMA200_Backtest.html Dragon_Alternativas.html
           git diff --staged --quiet || git commit -m "Daily update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
 
