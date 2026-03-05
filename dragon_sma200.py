@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Dragon Portfolio v3 — SMA200 Trend Filter
+Dragon Portfolio v3 — Doble SMA (SMA200 + Exit SMA50)
 Based on Dragon v2 + Strategy B from Alternativas analysis.
 
-Enhancement: SMA200 trend filter scales exposure per block based on how many
-selected assets are above their 200-day moving average. Below SMA200 → reduce
-exposure and park in SHY (cash proxy). Commodity Trend adds SMA200 gate.
+Enhancement: Dual SMA system — SMA200 trend filter scales exposure per block,
+SMA50 intra-month exit signal on Equity & Hard Assets exits to SHY when asset
+breaks below SMA50 (MOC execution). 30bp transaction cost per switch.
 
 SFinance-alicIA
 """
@@ -32,6 +32,9 @@ MOM_LOOKBACK = 126
 SMA_LONG = 200
 SMA_CMDTY = 50
 MIN_EXPOSURE = 0.30   # Minimum exposure when all picks below SMA200
+SMA_EXIT = 50         # SMA period for intra-month exit signal
+TX_COST_BPS = 30      # Transaction cost per exit/re-entry (basis points)
+EXIT_BLOCKS = {"Equity", "HardAssets"}  # Blocks with exit signal (not Bonds)
 
 START = "2006-03-01"
 TODAY = datetime.date.today()
@@ -47,7 +50,7 @@ COLORS = {
     "HardAssets": "#f59e0b",
     "LongVol":    "#ef4444",
     "CmdtyTrend": "#a855f7",
-    "Dragon":     "#06b6d4",  # SMA200 = cyan branding
+    "Dragon":     "#06b6d4",  # Doble SMA = cyan branding
     "DragonBase": "#94a3b8",
     "6040":       "#475569",
     "SPY":        "#3b82f6",
@@ -76,7 +79,7 @@ TICKER_COLORS = {
 # ═══════════════════════════════════════════════════════════════════
 CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "price_cache.json")
 
-print("═══ Dragon Portfolio v3 — SMA200 Trend Filter ═══\n")
+print("═══ Dragon Portfolio v3 — Doble SMA (SMA200 + Exit SMA50) ═══\n")
 
 def load_cache():
     if not os.path.exists(CACHE_FILE):
@@ -208,6 +211,20 @@ for t in ALL_TICKERS:
     sma200_above[t] = signal[1:]  # align with returns
     sma200_values[t] = sma_v
 
+# 3c. SMA intra-month exit signal
+sma_exit_above = {}
+for t in ALL_TICKERS:
+    p = price_data[t]
+    signal = np.full(N, False)
+    for i in range(N):
+        if i >= SMA_EXIT:
+            window = p[i - SMA_EXIT + 1:i + 1]
+            valid = window[~np.isnan(window)]
+            if len(valid) >= SMA_EXIT * 0.8:
+                signal[i] = p[i] > np.mean(valid)
+    sma_exit_above[t] = signal[1:]  # align with returns
+print(f"  SMA{SMA_EXIT} exit signal computed for {len(ALL_TICKERS)} tickers")
+
 for t in LATE_JOINERS:
     first_mom = None
     for i in range(N_ret):
@@ -272,7 +289,7 @@ for block in ["Equity", "Bonds", "HardAssets"]:
 print(f"  Selection periods: {len(selection_log)} months")
 
 # Exposure stats
-for block in ["Equity", "HardAssets"]:
+for block in ["Equity", "Bonds", "HardAssets"]:
     exp = np.array(exposure_scale[block])
     avg_exp = np.mean(exp)
     full_pct = np.sum(exp >= 0.99) / len(exp) * 100
@@ -286,34 +303,80 @@ print("\nConstructing strategies...")
 
 shy_ret = ret["SHY"]
 
-def dynamic_block_returns_sma200(block_name, use_sma_filter=True):
-    """Equal-weight average of top-N selected, with SMA200 exposure scaling."""
+def dynamic_block_returns_sma200(block_name, use_sma_filter=True, use_exit_signal=False):
+    """Equal-weight average of top-N selected, with SMA200 exposure scaling.
+    If use_exit_signal=True, assets below SMA_EXIT exit to SHY with TX_COST_BPS per switch.
+    Execution: MOC / ~5min before close (delay=0). Reset on monthly rebalance."""
     r = np.zeros(N_ret)
+    exit_count = 0
+    switch_count = 0
+    # Track per-asset exit state (reset each rebalance)
+    prev_exited = {}
+
     for i in range(N_ret):
         picks = selections[block_name][i]
-        valid = [ret[t][i] for t in picks if not np.isnan(ret[t][i])]
-        risk_ret = np.mean(valid) if valid else 0.0
+        shy_r = shy_ret[i] if not np.isnan(shy_ret[i]) else 0.0
+        is_rebal = (i == 0) or (dates_ret[i].month != dates_ret[i - 1].month)
+
+        if is_rebal:
+            prev_exited = {}  # fresh start on rebalance
+
+        if use_exit_signal:
+            valid = []
+            for t in picks:
+                t_ret = ret[t][i]
+                if np.isnan(t_ret):
+                    continue
+                was_exited = prev_exited.get(t, False)
+                is_below = (t in sma_exit_above and not sma_exit_above[t][i])
+
+                if is_below:
+                    # Asset below SMA → exit to SHY
+                    asset_ret = shy_r
+                    if not was_exited:
+                        switch_count += 1
+                        asset_ret -= TX_COST_BPS / 10000  # exit cost
+                    prev_exited[t] = True
+                    exit_count += 1
+                else:
+                    # Asset above SMA → stay/re-enter
+                    asset_ret = t_ret
+                    if was_exited:
+                        switch_count += 1
+                        asset_ret -= TX_COST_BPS / 10000  # re-entry cost
+                    prev_exited[t] = False
+                valid.append(asset_ret)
+            risk_ret = np.mean(valid) if valid else 0.0
+        else:
+            valid = [ret[t][i] for t in picks if not np.isnan(ret[t][i])]
+            risk_ret = np.mean(valid) if valid else 0.0
 
         if use_sma_filter:
             sc = exposure_scale[block_name][i]
-            shy_r = shy_ret[i] if not np.isnan(shy_ret[i]) else 0.0
             r[i] = sc * risk_ret + (1 - sc) * shy_r
         else:
             r[i] = risk_ret
-    return r
+    return r, exit_count, switch_count
 
-# SMA200-filtered components
-ret_equity_sma = dynamic_block_returns_sma200("Equity", True)
-print(f"  + Equity (SMA200 filtered, top-{N_SELECT} from {len(UNIVERSES['Equity'])}): {N_ret} days")
+# SMA200-filtered + SMA50 exit on Equity & Hard Assets (not Bonds)
+ret_equity_sma, eq_exits, eq_sw = dynamic_block_returns_sma200("Equity", True, "Equity" in EXIT_BLOCKS)
+eq_label = f"SMA200 + SMA{SMA_EXIT} exit @{TX_COST_BPS}bp" if "Equity" in EXIT_BLOCKS else "SMA200"
+print(f"  + Equity ({eq_label}, top-{N_SELECT} from {len(UNIVERSES['Equity'])}): {N_ret} days, {eq_exits} exits, {eq_sw} switches")
 
-ret_bonds = dynamic_block_returns_sma200("Bonds", False)  # Bonds: no SMA filter
-print(f"  + Bonds (no filter, top-{N_SELECT} from {len(UNIVERSES['Bonds'])}): {N_ret} days")
+ret_bonds, bo_exits, bo_sw = dynamic_block_returns_sma200("Bonds", True, "Bonds" in EXIT_BLOCKS)
+bo_label = f"SMA200 + SMA{SMA_EXIT} exit @{TX_COST_BPS}bp" if "Bonds" in EXIT_BLOCKS else "SMA200"
+print(f"  + Bonds ({bo_label}, top-{N_SELECT} from {len(UNIVERSES['Bonds'])}): {N_ret} days, {bo_exits} exits, {bo_sw} switches")
 
-ret_hard_sma = dynamic_block_returns_sma200("HardAssets", True)
-print(f"  + Hard Assets (SMA200 filtered, top-{N_SELECT} from {len(UNIVERSES['HardAssets'])}): {N_ret} days")
+ret_hard_sma, ha_exits, ha_sw = dynamic_block_returns_sma200("HardAssets", True, "HardAssets" in EXIT_BLOCKS)
+ha_label = f"SMA200 + SMA{SMA_EXIT} exit @{TX_COST_BPS}bp" if "HardAssets" in EXIT_BLOCKS else "SMA200"
+print(f"  + Hard Assets ({ha_label}, top-{N_SELECT} from {len(UNIVERSES['HardAssets'])}): {N_ret} days, {ha_exits} exits, {ha_sw} switches")
 
+total_switches = eq_sw + bo_sw + ha_sw
+print(f"  → Total switches: {total_switches} ({total_switches/max(N_ret/252,1):.0f}/year) @ {TX_COST_BPS}bp each")
+
+# Long Vol: BTAL only
 ret_longvol = ret["BTAL"] * BTAL_LEVERAGE
-print(f"  + Long Volatility (BTAL x{BTAL_LEVERAGE:.2f}): {N_ret} days")
+print(f"  + Long Volatility (BTAL): {N_ret} days")
 
 # Commodity Trend with SMA200 gate
 dbc_prices = price_data["DBC"]
@@ -339,8 +402,8 @@ for i in range(N_ret):
 print(f"  + Commodity Trend (SMA-50 + SMA200 gate on DBC): {N_ret} days")
 
 # Base Dragon (no SMA filter) for comparison
-ret_equity_base = dynamic_block_returns_sma200("Equity", False)
-ret_hard_base = dynamic_block_returns_sma200("HardAssets", False)
+ret_equity_base, _, _ = dynamic_block_returns_sma200("Equity", False)
+ret_hard_base, _, _ = dynamic_block_returns_sma200("HardAssets", False)
 
 dbc_prices2 = price_data["DBC"]
 ret_cmdty_base = np.zeros(N_ret)
@@ -429,7 +492,7 @@ for comp in comp_ret_sma:
     nav_comp[comp] = cum_nav(comp_ret_sma[comp])
 
 rebal_count = sum(1 for i in range(1, N_ret) if dates_ret[i].month != dates_ret[i-1].month) + 1
-print(f"  + Dragon SMA200:    ${nav_dragon[-1]:.2f} (from $1) [{rebal_count} rebalances]")
+print(f"  + Dragon Doble SMA:    ${nav_dragon[-1]:.2f} (from $1) [{rebal_count} rebalances]")
 print(f"  + Dragon Base:      ${nav_base[-1]:.2f}")
 print(f"  + 60/40 Portfolio:  ${nav_6040[-1]:.2f}")
 print(f"  + S&P 500:          ${nav_spy[-1]:.2f}")
@@ -461,7 +524,7 @@ def calc_metrics(returns, name=""):
         "ret_to_risk": ret_to_risk, "total": total * 100, "years": years,
     }
 
-m_dragon = calc_metrics(dragon_ret, "Dragon SMA200")
+m_dragon = calc_metrics(dragon_ret, "Dragon Doble SMA")
 m_base = calc_metrics(base_ret, "Dragon Base")
 m_6040 = calc_metrics(port_6040_ret, "60/40 Portfolio")
 m_spy = calc_metrics(spy_ret, "S&P 500")
@@ -476,7 +539,7 @@ comp_names = ["Equity", "Bonds", "HardAssets", "LongVol", "CmdtyTrend"]
 corr_data = np.column_stack([comp_ret_sma[c] for c in comp_names])
 corr_matrix = np.corrcoef(corr_data, rowvar=False)
 
-print(f"  Dragon SMA200: CAGR {m_dragon['cagr']*100:+.1f}%  Sharpe {m_dragon['sharpe']:.2f}  MDD {m_dragon['mdd']:.1f}%")
+print(f"  Dragon Doble SMA: CAGR {m_dragon['cagr']*100:+.1f}%  Sharpe {m_dragon['sharpe']:.2f}  MDD {m_dragon['mdd']:.1f}%")
 print(f"  Dragon Base:   CAGR {m_base['cagr']*100:+.1f}%  Sharpe {m_base['sharpe']:.2f}  MDD {m_base['mdd']:.1f}%")
 print(f"  60/40:         CAGR {m_6040['cagr']*100:+.1f}%  Sharpe {m_6040['sharpe']:.2f}  MDD {m_6040['mdd']:.1f}%")
 print(f"  S&P 500:       CAGR {m_spy['cagr']*100:+.1f}%  Sharpe {m_spy['sharpe']:.2f}  MDD {m_spy['mdd']:.1f}%")
@@ -738,7 +801,7 @@ def build_exposure_chart():
         svg += f'<line x1="{ml}" y1="{yp:.0f}" x2="{vw-mr}" y2="{yp:.0f}" stroke="rgba(148,163,184,0.1)" stroke-width="0.5"/>'
         svg += f'<text x="{ml-5}" y="{yp:.0f}" text-anchor="end" fill="#64748b" font-size="8" dominant-baseline="middle">{pct:.0%}</text>'
     # Lines
-    for block, color in [("Equity", COLORS["Equity"]), ("HardAssets", COLORS["HardAssets"])]:
+    for block, color in [("Equity", COLORS["Equity"]), ("Bonds", COLORS["Bonds"]), ("HardAssets", COLORS["HardAssets"])]:
         exp = exposure_scale[block]
         pts = []
         for i in range(N_ret):
@@ -881,7 +944,7 @@ html = f'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dragon Portfolio v3 — SMA200 Trend Filter | SFinance</title>
+<title>Dragon Portfolio v3 — Doble SMA | SFinance</title>
 <style>
 * {{ margin:0; padding:0; box-sizing:border-box; }}
 body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; color:#e2e8f0; }}
@@ -942,8 +1005,8 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
 
   <div class="header">
     <div>
-      <div class="header-title"><span>Dragon Portfolio</span> v3 — SMA200 Trend Filter</div>
-      <div style="font-size:10px;color:#64748b;margin-top:2px">Artemis Capital (2020) + SMA200 Trend Filter | Top-{N_SELECT} momentum {MOM_LOOKBACK}d | {len(ALL_TICKERS)} activos | BTC-USD late-joiner</div>
+      <div class="header-title"><span>Dragon Portfolio</span> v3 — Doble SMA</div>
+      <div style="font-size:10px;color:#64748b;margin-top:2px">Artemis Capital (2020) + SMA200 Filter + SMA{SMA_EXIT} Exit Signal | Top-{N_SELECT} momentum {MOM_LOOKBACK}d | {len(ALL_TICKERS)} activos</div>
     </div>
     <div class="header-sub"><strong>SFinance-alicIA</strong><br>{TODAY.strftime("%d %b %Y")} | {dates[0]} -> {dates[-1]}</div>
   </div>
@@ -953,6 +1016,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div style="font-size:10px;color:#cbd5e1;line-height:1.8">
       <p>El <strong style="color:#e2e8f0">Dragon Portfolio v3</strong> parte de la tesis de <strong style="color:#e2e8f0">Artemis Capital</strong> y agrega un <strong style="color:#06b6d4">filtro de tendencia SMA200</strong>: antes de invertir en un activo, pregunta <em>"esta por encima de su media movil de 200 dias?"</em></p>
       <p style="margin-top:6px">Si un activo esta en <strong style="color:#10b981">tendencia alcista</strong> (sobre SMA200), recibe exposicion completa. Si esta en <strong style="color:#ef4444">tendencia bajista</strong> (bajo SMA200), se reduce su peso y el capital se redirige a <strong style="color:#e2e8f0">SHY</strong> (cash proxy). El filtro opera a nivel de bloque: la exposicion es proporcional a cuantos de los {N_SELECT} seleccionados estan sobre su SMA200 (minimo {MIN_EXPOSURE:.0%}).</p>
+      <p style="margin-top:6px">Ademas, un <strong style="color:#f59e0b">exit signal SMA{SMA_EXIT}</strong> opera intra-mes en Equity y Hard Assets: si un activo seleccionado rompe por debajo de su SMA{SMA_EXIT}, se sale a SHY (~5min antes del cierre, MOC order) hasta el proximo rebalanceo. Coste estimado: <strong style="color:#e2e8f0">{TX_COST_BPS}bp por switch</strong>.</p>
       <p style="margin-top:6px">El resultado es un portafolio que <strong style="color:#e2e8f0">participa en las subidas pero se protege parcialmente en las bajadas</strong> — mejorando el ratio retorno/riesgo (Sharpe <span style="color:#06b6d4">+{sharpe_delta:.0f}%</span> vs Dragon base) sin cambiar la estructura de diversificacion secular.</p>
     </div>
   </div>
@@ -960,10 +1024,10 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   <div class="alloc-section">
     <div style="text-align:center">{build_donut()}</div>
     <div class="alloc-desc">
-      <div style="margin-bottom:8px;font-size:12px;font-weight:700;color:#e2e8f0">Diversificacion secular + Momentum top-{N_SELECT} + <span style="color:#06b6d4">SMA200 Filter</span></div>
+      <div style="margin-bottom:8px;font-size:12px;font-weight:700;color:#e2e8f0">Diversificacion secular + Momentum top-{N_SELECT} + <span style="color:#06b6d4">Doble SMA</span></div>
       <p style="margin-bottom:8px">Cada mes se eligen los <strong style="color:#06b6d4">{N_SELECT} mejores</strong> por retorno trailing {MOM_LOOKBACK}d. Luego se aplica el filtro SMA200: la exposicion al bloque se escala segun cuantos picks estan sobre su SMA200.</p>
-      <div><span class="type-label serpent-label">SERPIENTE 42%</span> Equity (24%): {len(UNIVERSES["Equity"])} cand. <span class="type-label sma-label">SMA200</span> | Bonds (18%): {len(UNIVERSES["Bonds"])} cand.</div>
-      <div style="margin-top:4px"><span class="type-label hawk-label">HALCON 58%</span> Hard Assets (19%): {len(UNIVERSES["HardAssets"])} cand. <span class="type-label sma-label">SMA200</span> | Long Vol (21%) | Cmdty Trend (18%) <span class="type-label sma-label">SMA200 GATE</span></div>
+      <div><span class="type-label serpent-label">SERPIENTE 42%</span> Equity (24%): {len(UNIVERSES["Equity"])} cand. <span class="type-label sma-label">SMA200</span> | Bonds (18%): {len(UNIVERSES["Bonds"])} cand. <span class="type-label sma-label">SMA200</span></div>
+      <div style="margin-top:4px"><span class="type-label hawk-label">HALCON 58%</span> Hard Assets (19%): {len(UNIVERSES["HardAssets"])} cand. <span class="type-label sma-label">SMA200</span> | Long Vol (21%): BTAL | Cmdty Trend (18%) <span class="type-label sma-label">SMA200 GATE</span></div>
     </div>
   </div>
 
@@ -982,7 +1046,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="section-title">Crecimiento de $1 — Escala Logaritmica</div>
     <div class="chart-container">{build_main_chart()}</div>
     <div class="legend-row">
-      <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div><strong style="color:#06b6d4">Dragon v3 SMA200</strong> ${nav_dragon[-1]:.2f}</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div><strong style="color:#06b6d4">Dragon v3 Doble SMA</strong> ${nav_dragon[-1]:.2f}</div>
       <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Dragon Base ${nav_base[-1]:.2f}</div>
       <div class="legend-item"><div class="legend-dot" style="background:#475569"></div>60/40 ${nav_6040[-1]:.2f}</div>
       <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>S&P 500 ${nav_spy[-1]:.2f}</div>
@@ -990,10 +1054,11 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div class="section">
-    <div class="section-title">Exposicion SMA200 — Equity & Hard Assets (proporcion del bloque invertida en riesgo vs cash)</div>
+    <div class="section-title">Exposicion SMA200 — Equity, Bonds & Hard Assets (proporcion del bloque invertida en riesgo vs cash)</div>
     <div class="chart-container">{build_exposure_chart()}</div>
     <div class="legend-row">
       <div class="legend-item"><div class="legend-dot" style="background:{COLORS['Equity']}"></div><span style="color:{COLORS['Equity']}">Equity</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:{COLORS['Bonds']}"></div><span style="color:{COLORS['Bonds']}">Bonds</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:{COLORS['HardAssets']}"></div><span style="color:{COLORS['HardAssets']}">Hard Assets</span></div>
       <div class="legend-item" style="color:#475569">100% = todos sobre SMA200 | {MIN_EXPOSURE:.0%} = minimo (todos bajo SMA200)</div>
     </div>
@@ -1009,7 +1074,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
       </div>
       <div class="type-components">
         <div style="margin-bottom:4px"><span class="comp-tag" style="background:rgba(16,185,129,0.15);color:#10b981">Equity 24%</span> Top-{N_SELECT} de: {universe_tags("Equity")} <span class="comp-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4">SMA200</span></div>
-        <div><span class="comp-tag" style="background:rgba(6,182,212,0.15);color:#06b6d4">Bonds 18%</span> Top-{N_SELECT} de: {universe_tags("Bonds")} <span style="color:#475569;font-size:8px">(sin filtro SMA)</span></div>
+        <div><span class="comp-tag" style="background:rgba(6,182,212,0.15);color:#06b6d4">Bonds 18%</span> Top-{N_SELECT} de: {universe_tags("Bonds")} <span class="type-label sma-label">SMA200</span></div>
       </div>
     </div>
     <div class="type-card hawk">
@@ -1021,7 +1086,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
       </div>
       <div class="type-components">
         <div style="margin-bottom:4px"><span class="comp-tag" style="background:rgba(245,158,11,0.15);color:#f59e0b">Hard Assets 19%</span> Top-{N_SELECT} de: {universe_tags("HardAssets")} <span class="comp-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4">SMA200</span><br><span style="font-size:8px;color:#475569">BTC-USD compite desde ~2015 (late-joiner)</span></div>
-        <span class="comp-tag" style="background:rgba(239,68,68,0.15);color:#ef4444">Long Vol 21%</span> BTAL{' x'+str(BTAL_LEVERAGE) if BTAL_LEVERAGE != 1.0 else ''} <span style="color:#475569;font-size:8px">(sin filtro SMA)</span><br>
+        <span class="comp-tag" style="background:rgba(239,68,68,0.15);color:#ef4444">Long Vol 21%</span> BTAL (Anti-Beta) <span style="color:#475569;font-size:8px">(sin filtro SMA)</span><br>
         <span class="comp-tag" style="background:rgba(168,85,247,0.15);color:#a855f7">Cmdty Trend 18%</span> DBC + SMA-50 <span class="comp-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4">SMA200 GATE</span>
       </div>
     </div>
@@ -1075,7 +1140,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="section-title">Drawdown — Dragon v3 vs Base vs 60/40</div>
     <div class="chart-container">{build_drawdown_chart()}</div>
     <div class="legend-row">
-      <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div><span style="color:#06b6d4">Dragon v3 SMA200</span> MDD: {m_dragon['mdd']:.1f}%</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div><span style="color:#06b6d4">Dragon v3 Doble SMA</span> MDD: {m_dragon['mdd']:.1f}%</div>
       <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div><span style="color:#94a3b8">Dragon Base</span> MDD: {m_base['mdd']:.1f}%</div>
       <div class="legend-item"><div class="legend-dot" style="background:#475569"></div><span style="color:#475569">60/40</span> MDD: {m_6040['mdd']:.1f}%</div>
     </div>
@@ -1085,7 +1150,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="card">
       <div class="section-title">Performance por Regimen (CAGR)</div>
       <table class="data-table">
-        <tr><th>Regimen</th><th class="num">Dias</th><th class="num" style="color:#06b6d4">v3 SMA200</th><th class="num">Base</th><th class="num">60/40</th><th class="num" style="color:#10b981">Serpiente</th><th class="num" style="color:#f59e0b">Halcon</th></tr>
+        <tr><th>Regimen</th><th class="num">Dias</th><th class="num" style="color:#06b6d4">v3 Doble SMA</th><th class="num">Base</th><th class="num">60/40</th><th class="num" style="color:#10b981">Serpiente</th><th class="num" style="color:#f59e0b">Halcon</th></tr>
         {regime_rows()}
       </table>
     </div>
@@ -1098,7 +1163,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   <div class="section">
     <div class="section-title">Retornos Anuales</div>
     <table class="data-table">
-      <tr><th>Ano</th><th class="num" style="color:#06b6d4">v3 SMA200</th><th class="num">Base</th><th class="num">60/40</th><th class="num" style="color:#3b82f6">S&P 500</th><th class="num" style="color:#10b981">Serpiente</th><th class="num" style="color:#f59e0b">Halcon</th></tr>
+      <tr><th>Ano</th><th class="num" style="color:#06b6d4">v3 Doble SMA</th><th class="num">Base</th><th class="num">60/40</th><th class="num" style="color:#3b82f6">S&P 500</th><th class="num" style="color:#10b981">Serpiente</th><th class="num" style="color:#f59e0b">Halcon</th></tr>
       {annual_rows()}
     </table>
   </div>
@@ -1108,7 +1173,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <table class="data-table">
       <tr>
         <th>Evento</th><th>Periodo</th>
-        <th class="num" style="color:#06b6d4">v3 SMA200</th>
+        <th class="num" style="color:#06b6d4">v3 Doble SMA</th>
         <th class="num">Base</th>
         <th class="num">60/40</th>
         <th class="num" style="color:#3b82f6">S&P 500</th>
@@ -1124,7 +1189,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="section-title">Estadisticas Completas</div>
     <div class="table-scroll">
     <table class="data-table">
-      <tr><th>Metrica</th><th class="num" style="color:#06b6d4">v3 SMA200</th><th class="num">Base</th><th class="num">60/40</th><th class="num" style="color:#3b82f6">S&P 500</th><th class="num" style="color:{COLORS['Equity']}">Equity</th><th class="num" style="color:{COLORS['Bonds']}">Bonds</th><th class="num" style="color:{COLORS['HardAssets']}">Hard Assets</th><th class="num" style="color:{COLORS['LongVol']}">Long Vol</th><th class="num" style="color:{COLORS['CmdtyTrend']}">Cmdty Trend</th></tr>
+      <tr><th>Metrica</th><th class="num" style="color:#06b6d4">v3 Doble SMA</th><th class="num">Base</th><th class="num">60/40</th><th class="num" style="color:#3b82f6">S&P 500</th><th class="num" style="color:{COLORS['Equity']}">Equity</th><th class="num" style="color:{COLORS['Bonds']}">Bonds</th><th class="num" style="color:{COLORS['HardAssets']}">Hard Assets</th><th class="num" style="color:{COLORS['LongVol']}">Long Vol</th><th class="num" style="color:{COLORS['CmdtyTrend']}">Cmdty Trend</th></tr>
       <tr><td>CAGR</td><td class="num" style="font-weight:700;color:#06b6d4">{m_dragon['cagr']*100:+.1f}%</td><td class="num">{m_base['cagr']*100:+.1f}%</td><td class="num">{m_6040['cagr']*100:+.1f}%</td><td class="num">{m_spy['cagr']*100:+.1f}%</td><td class="num">{m_comp['Equity']['cagr']*100:+.1f}%</td><td class="num">{m_comp['Bonds']['cagr']*100:+.1f}%</td><td class="num">{m_comp['HardAssets']['cagr']*100:+.1f}%</td><td class="num">{m_comp['LongVol']['cagr']*100:+.1f}%</td><td class="num">{m_comp['CmdtyTrend']['cagr']*100:+.1f}%</td></tr>
       <tr><td>Volatilidad</td><td class="num" style="font-weight:700">{m_dragon['vol']*100:.1f}%</td><td class="num">{m_base['vol']*100:.1f}%</td><td class="num">{m_6040['vol']*100:.1f}%</td><td class="num">{m_spy['vol']*100:.1f}%</td><td class="num">{m_comp['Equity']['vol']*100:.1f}%</td><td class="num">{m_comp['Bonds']['vol']*100:.1f}%</td><td class="num">{m_comp['HardAssets']['vol']*100:.1f}%</td><td class="num">{m_comp['LongVol']['vol']*100:.1f}%</td><td class="num">{m_comp['CmdtyTrend']['vol']*100:.1f}%</td></tr>
       <tr><td>Sharpe</td><td class="num" style="font-weight:700;color:#06b6d4">{m_dragon['sharpe']:.2f}</td><td class="num">{m_base['sharpe']:.2f}</td><td class="num">{m_6040['sharpe']:.2f}</td><td class="num">{m_spy['sharpe']:.2f}</td><td class="num">{m_comp['Equity']['sharpe']:.2f}</td><td class="num">{m_comp['Bonds']['sharpe']:.2f}</td><td class="num">{m_comp['HardAssets']['sharpe']:.2f}</td><td class="num">{m_comp['LongVol']['sharpe']:.2f}</td><td class="num">{m_comp['CmdtyTrend']['sharpe']:.2f}</td></tr>
@@ -1140,11 +1205,13 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="section-title">Metodologia</div>
     <div style="font-size:9px;color:#94a3b8;line-height:1.7;columns:2;column-gap:24px">
       <p><strong style="color:#e2e8f0">Momentum {MOM_LOOKBACK}d</strong> — price[t] / price[t-{MOM_LOOKBACK}] - 1. Cierre previo al rebalanceo (sin look-ahead). Top-{N_SELECT} por bloque, equal-weight.</p>
-      <p style="margin-top:6px"><strong style="color:#06b6d4">SMA200 Trend Filter</strong> — Para Equity y Hard Assets: la exposicion al bloque = (# picks sobre SMA200) / {N_SELECT}. Minimo {MIN_EXPOSURE:.0%}. Capital no-expuesto se invierte en SHY (cash proxy). Para Commodity Trend: DBC debe estar sobre SMA200 para activar la senal SMA50.</p>
-      <p style="margin-top:6px"><strong style="color:#e2e8f0">Equity (24%)</strong> — {len(UNIVERSES["Equity"])} candidatos: {", ".join(UNIVERSES["Equity"])}. <span style="color:#06b6d4">SMA200 filtered.</span></p>
-      <p style="margin-top:6px"><strong style="color:#e2e8f0">Bonds (18%)</strong> — {len(UNIVERSES["Bonds"])} candidatos: {", ".join(UNIVERSES["Bonds"])}. Sin filtro SMA (activo defensivo).</p>
-      <p style="margin-top:6px"><strong style="color:#e2e8f0">Hard Assets (19%)</strong> — {len(UNIVERSES["HardAssets"])} candidatos: {", ".join(UNIVERSES["HardAssets"])}. BTC-USD late-joiner (~2015). <span style="color:#06b6d4">SMA200 filtered.</span></p>
-      <p style="margin-top:6px"><strong style="color:#e2e8f0">Long Vol (21%)</strong> — BTAL fijo. Sin filtro SMA (cobertura de crisis).</p>
+      <p style="margin-top:6px"><strong style="color:#06b6d4">SMA200 Filtro de Exposicion</strong> — Para Equity, Bonds y Hard Assets: la exposicion al bloque = (# picks sobre SMA200) / {N_SELECT}. Minimo {MIN_EXPOSURE:.0%}. Capital no-expuesto se invierte en SHY (cash proxy). Para Commodity Trend: DBC debe estar sobre SMA200 para activar la senal SMA50.</p>
+      <p style="margin-top:6px"><strong style="color:#f59e0b">SMA{SMA_EXIT} Exit Signal</strong> — Para Equity y Hard Assets: si un activo seleccionado rompe por debajo de su SMA{SMA_EXIT}, se sale a SHY (orden MOC, ~5min antes del cierre). Re-entra cuando recupera SMA{SMA_EXIT}. Coste: {TX_COST_BPS}bp por switch. ~{total_switches/max(N_ret/252,1):.0f} switches/ano.</p>
+      <p style="margin-top:6px"><strong style="color:#f59e0b">SMA{SMA_EXIT} Exit Signal</strong> — Intra-mes en Equity y Hard Assets: si un activo rompe bajo su SMA{SMA_EXIT}, se sale a SHY (MOC order, ~5min before close). Re-entrada cuando vuelve sobre SMA{SMA_EXIT}. Reset en rebalanceo mensual. Coste: {TX_COST_BPS}bp/switch.</p>
+      <p style="margin-top:6px"><strong style="color:#e2e8f0">Equity (24%)</strong> — {len(UNIVERSES["Equity"])} candidatos: {", ".join(UNIVERSES["Equity"])}. <span style="color:#06b6d4">SMA200</span> + <span style="color:#f59e0b">SMA{SMA_EXIT} exit</span>.</p>
+      <p style="margin-top:6px"><strong style="color:#e2e8f0">Bonds (18%)</strong> — {len(UNIVERSES["Bonds"])} candidatos: {", ".join(UNIVERSES["Bonds"])}. <span style="color:#06b6d4">SMA200 filtered.</span></p>
+      <p style="margin-top:6px"><strong style="color:#e2e8f0">Hard Assets (19%)</strong> — {len(UNIVERSES["HardAssets"])} candidatos: {", ".join(UNIVERSES["HardAssets"])}. BTC-USD late-joiner (~2015). <span style="color:#06b6d4">SMA200</span> + <span style="color:#f59e0b">SMA{SMA_EXIT} exit</span>.</p>
+      <p style="margin-top:6px"><strong style="color:#e2e8f0">Long Vol (21%)</strong> — BTAL (Anti-Beta). Sin filtro SMA.</p>
       <p style="margin-top:6px"><strong style="color:#e2e8f0">Cmdty Trend (18%)</strong> — DBC + SMA-50. <span style="color:#06b6d4">SMA200 gate</span>: DBC &lt; SMA200 → exposicion 0%.</p>
       <p style="margin-top:6px"><strong style="color:#e2e8f0">Benchmarks</strong> — Dragon Base (sin SMA200), 60/40 (SPY+TLT fijo), S&P 500.</p>
       <p style="margin-top:6px"><strong style="color:#e2e8f0">Rf</strong> — {RF_ANNUAL*100:.1f}%.</p>
@@ -1152,7 +1219,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div class="footer">
-    <span>SFinance-alicIA | Dragon Portfolio v3 SMA200 | Solo fines informativos</span>
+    <span>SFinance-alicIA | Dragon Portfolio v3 Doble SMA | Solo fines informativos</span>
     <span>{TODAY.strftime("%Y-%m-%d")} | {len(ALL_TICKERS)} activos ({len(LATE_JOINERS)} late-joiner) | SMA200 min exposure {MIN_EXPOSURE:.0%}</span>
   </div>
 

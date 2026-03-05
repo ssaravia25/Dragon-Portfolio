@@ -59,16 +59,31 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
 
     <a href="Dragon_SMA200_Backtest.html" class="card">
       <div class="card-accent" style="background:#06b6d4"></div>
-      <div class="card-version" style="color:#06b6d4">v3 — SMA200 Trend Filter</div>
-      <div class="card-title">Dragon Portfolio — SMA200 Trend Filter</div>
+      <div class="card-version" style="color:#06b6d4">v3 — Doble SMA</div>
+      <div class="card-title">Dragon Portfolio — Doble SMA</div>
       <div class="card-desc">
-        Evolucion del Dragon base con filtro de tendencia SMA200: escala la exposicion de cada bloque segun cuantos activos seleccionados estan sobre su media movil de 200 dias. Debajo de SMA200 se reduce exposicion y se redirige a SHY (cash proxy). Mejora Sharpe +38% vs base.
+        Sistema dual SMA: el SMA200 escala la exposicion del bloque, y el SMA50 opera como exit signal intra-mes en Equity y Hard Assets (sale a SHY si el activo rompe su SMA50, re-entra cuando recupera). Ejecucion MOC. Coste estimado: 30bp por switch (~126/ano).
       </div>
       <div class="card-kpis">
-        <div class="card-kpi"><div class="ck-label">CAGR</div><div class="ck-value pos">+13.9%</div></div>
-        <div class="card-kpi"><div class="ck-label">Sharpe</div><div class="ck-value" style="color:#06b6d4">1.39</div></div>
-        <div class="card-kpi"><div class="ck-label">Max DD</div><div class="ck-value neg">-8.0%</div></div>
-        <div class="card-kpi"><div class="ck-label">Vol</div><div class="ck-value">6.9%</div></div>
+        <div class="card-kpi"><div class="ck-label">CAGR</div><div class="ck-value pos">+20.5%</div></div>
+        <div class="card-kpi"><div class="ck-label">Sharpe</div><div class="ck-value" style="color:#06b6d4">2.63</div></div>
+        <div class="card-kpi"><div class="ck-label">Max DD</div><div class="ck-value neg">-7.7%</div></div>
+        <div class="card-kpi"><div class="ck-label">Vol</div><div class="ck-value">6.0%</div></div>
+      </div>
+    </a>
+
+    <a href="Dragon_Live.html" class="card">
+      <div class="card-accent" style="background:#22c55e"></div>
+      <div class="card-version" style="color:#22c55e">LIVE 2026</div>
+      <div class="card-title">Centinela v3 — Live Dashboard</div>
+      <div class="card-desc">
+        Dashboard en vivo de Centinela v3 Doble SMA. Posiciones actuales, alertas SMA50 de salida/reentrada (MOC), exposicion SMA200 por bloque, evolutivo YTD. Se actualiza diariamente. Rebalanceo mensual + alertas pre-cierre por email.
+      </div>
+      <div class="card-kpis">
+        <div class="card-kpi"><div class="ck-label">Status</div><div class="ck-value" style="color:#22c55e">LIVE</div></div>
+        <div class="card-kpi"><div class="ck-label">Capital</div><div class="ck-value" style="color:#94a3b8;font-size:14px">$10,000</div></div>
+        <div class="card-kpi"><div class="ck-label">Rebal</div><div class="ck-value" style="color:#94a3b8;font-size:14px">Mensual</div></div>
+        <div class="card-kpi"><div class="ck-label">Update</div><div class="ck-value" style="color:#94a3b8;font-size:14px">Diario</div></div>
       </div>
     </a>
 

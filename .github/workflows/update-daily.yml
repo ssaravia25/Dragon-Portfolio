@@ -2,8 +2,8 @@ name: Daily Portfolio Update
 
 on:
   schedule:
-    # Runs at 22:00 UTC every weekday (Mon-Fri) — after US market close
-    - cron: '0 22 * * 1-5'
+    - cron: '0 22 * * 1-5'    # After US close: full run (reports + daily email)
+    - cron: '30 20 * * 1-5'   # Pre-close (~3:30pm ET summer): SMA50 alert only
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 permissions:
@@ -16,7 +16,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Pre-close alert: lightweight SMA50 signal check (~30min before close)
+  pre-close-alert:
+    if: github.event.schedule == '30 20 * * 1-5'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run SMA50 alert check
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_MODE: "1"
+        run: python dragon_live.py
+
+  # Full daily update: all reports + daily email + deploy
   update-reports:
+    if: github.event.schedule != '30 20 * * 1-5' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,16 +68,22 @@ jobs:
       - name: Run dragon_alternatives.py
         run: python dragon_alternatives.py
 
+      - name: Run dragon_live.py
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python dragon_live.py
+
       - name: Commit updated reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Dragon_Portfolio_Backtest.html Dragon_SMA200_Backtest.html Dragon_Alternativas.html
+          git add Dragon_Portfolio_Backtest.html Dragon_SMA200_Backtest.html Dragon_Alternativas.html Dragon_Live.html last_rebal.json index.html
           git diff --staged --quiet || git commit -m "Daily update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
 
   deploy-pages:
     needs: update-reports
+    if: always() && needs.update-reports.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
