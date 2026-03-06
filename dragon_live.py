@@ -45,6 +45,19 @@ BTAL_LEVERAGE = 1.0
 INITIAL_CAPITAL = 10_000
 ALERT_MODE = os.environ.get("ALERT_MODE") == "1"
 
+# ── Email config ──
+GMAIL_SENDER = "sgseaux@gmail.com"
+EMAIL_RECIPIENTS = [
+    "sergiosar@gmail.com",
+    "sergio@kobo.cl",
+    "alvaro@kobo.cl",
+    "ianmcharboe@gmail.com",
+    "nanogarcia@gmail.com",
+    "jcarrasco@zinvestments.cl",
+    "thomasbertiez@gmail.com",
+    "anremar@gmail.com",
+]
+
 W_DRAGON = {"Equity": 0.24, "Bonds": 0.18, "HardAssets": 0.19, "LongVol": 0.21, "CmdtyTrend": 0.18}
 W_6040 = {"Equity": 0.60, "Bonds": 0.40}
 
@@ -670,9 +683,7 @@ if ALERT_MODE:
     if sma50_new_exits or sma50_new_entries or sma50_watch:
         print("\nPre-close alert mode — sending signal email...")
         # Inline pre-close alert send
-        gmail_user = "sgseaux@gmail.com"
         gmail_pass = os.environ.get("GMAIL_APP_PASSWORD")
-        recipient = "sergiosar@gmail.com"
         if gmail_pass:
             alert_parts = []
             if sma50_new_exits:
@@ -702,14 +713,15 @@ if ALERT_MODE:
             </div>"""
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = gmail_user
-            msg["To"] = recipient
+            msg["From"] = GMAIL_SENDER
+            msg["To"] = GMAIL_SENDER
+            msg["Bcc"] = ", ".join(EMAIL_RECIPIENTS)
             msg.attach(MIMEText(html_body, "html"))
             try:
                 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-                    server.login(gmail_user, gmail_pass)
-                    server.sendmail(gmail_user, recipient, msg.as_string())
-                print(f"  Pre-close alert sent to {recipient}")
+                    server.login(GMAIL_SENDER, gmail_pass)
+                    server.sendmail(GMAIL_SENDER, EMAIL_RECIPIENTS, msg.as_string())
+                print(f"  Pre-close alert sent to {len(EMAIL_RECIPIENTS)} recipients (BCC)")
             except Exception as e:
                 print(f"  ! Email error: {e}")
         else:
@@ -1778,9 +1790,7 @@ def build_daily_email_html():
     </div>"""
 
 def send_daily_email():
-    gmail_user = "sgseaux@gmail.com"
     gmail_pass = os.environ.get("GMAIL_APP_PASSWORD")
-    recipient = "sergiosar@gmail.com"
     if not gmail_pass:
         print("  ! GMAIL_APP_PASSWORD not set — skipping email")
         return False
@@ -1796,14 +1806,15 @@ def send_daily_email():
         subject = f"Centinela v3 — NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}% | {TODAY}"
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = gmail_user
-    msg["To"] = recipient
+    msg["From"] = GMAIL_SENDER
+    msg["To"] = GMAIL_SENDER
+    msg["Bcc"] = ", ".join(EMAIL_RECIPIENTS)
     msg.attach(MIMEText(build_daily_email_html(), "html"))
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(gmail_user, gmail_pass)
-            server.sendmail(gmail_user, recipient, msg.as_string())
-        print(f"  Email sent to {recipient}")
+            server.login(GMAIL_SENDER, gmail_pass)
+            server.sendmail(GMAIL_SENDER, EMAIL_RECIPIENTS, msg.as_string())
+        print(f"  Email sent to {len(EMAIL_RECIPIENTS)} recipients (BCC)")
         return True
     except Exception as e:
         print(f"  ! Email error: {e}")
