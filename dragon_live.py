@@ -678,55 +678,81 @@ print(f"  NAV: ${nav_live[-1]:,.2f} | YTD: {ytd_ret:+.2f}% | Today: {today_ret:+
 
 # ─── ALERT MODE EARLY EXIT (skip HTML generation) ───
 if ALERT_MODE:
-    # Import email helpers at module level already done (smtplib, MIMEText, etc.)
-    REBAL_STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "last_rebal.json")
-    if sma50_new_exits or sma50_new_entries or sma50_watch:
-        print("\nPre-close alert mode — sending signal email...")
-        # Inline pre-close alert send
-        gmail_pass = os.environ.get("GMAIL_APP_PASSWORD")
-        if gmail_pass:
-            alert_parts = []
-            if sma50_new_exits:
-                subject = f"PRE-CLOSE — SELL {', '.join(sma50_new_exits)} MOC | Centinela v3"
-                for t in sma50_new_exits:
-                    s = sma50_exit_status[t]
-                    label = TICKER_LABELS.get(t, t)
-                    alert_parts.append(f'<b style="color:#ef4444">SELL {t} ({label}) → SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}')
-            elif sma50_new_entries:
-                subject = f"PRE-CLOSE — BUY {', '.join(sma50_new_entries)} MOC | Centinela v3"
-                for t in sma50_new_entries:
-                    s = sma50_exit_status[t]
-                    label = TICKER_LABELS.get(t, t)
-                    alert_parts.append(f'<b style="color:#10b981">BUY {t} ({label}) ← SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}')
-            else:
-                subject = f"WATCH — Assets near SMA50 | Centinela v3"
-                for t, pct, block in sma50_watch:
-                    label = TICKER_LABELS.get(t, t)
-                    alert_parts.append(f'<b style="color:#f59e0b">{t} ({label})</b> — {pct:+.1f}% from SMA50')
-            body_rows = "<br>".join(alert_parts)
-            html_body = f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
-                <h2 style="color:#f59e0b;margin-bottom:4px">Centinela v3 — Pre-Close Alert</h2>
-                <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} — ~30min before close</p>
-                <div style="background:#0f172a;padding:16px;border-radius:6px;font-size:13px;line-height:1.8">{body_rows}</div>
-                <p style="margin-top:16px;font-size:10px;color:#475569">Based on intraday prices. Confirm before executing MOC.</p>
-                <p style="font-size:10px;color:#475569">SFinance-alicIA | Centinela v3 Dual SMA</p>
-            </div>"""
-            msg = MIMEMultipart("alternative")
-            msg["Subject"] = subject
-            msg["From"] = GMAIL_SENDER
-            msg["To"] = GMAIL_SENDER
-            msg.attach(MIMEText(html_body, "html"))
-            try:
-                with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-                    server.login(GMAIL_SENDER, gmail_pass)
-                    server.sendmail(GMAIL_SENDER, EMAIL_RECIPIENTS, msg.as_string())
-                print(f"  Pre-close alert sent to {len(EMAIL_RECIPIENTS)} recipients (BCC)")
-            except Exception as e:
-                print(f"  ! Email error: {e}")
+    print("\nPre-close alert mode — building status email...")
+    gmail_pass = os.environ.get("GMAIL_APP_PASSWORD")
+    if gmail_pass:
+        # Subject reflects urgency
+        if sma50_new_exits:
+            subject = f"PRE-CLOSE — SELL {', '.join(sma50_new_exits)} MOC | Centinela v3"
+        elif sma50_new_entries:
+            subject = f"PRE-CLOSE — BUY {', '.join(sma50_new_entries)} MOC | Centinela v3"
+        elif sma50_watch:
+            subject = f"PRE-CLOSE WATCH — Assets near SMA50 | Centinela v3"
         else:
-            print("  ! GMAIL_APP_PASSWORD not set — skipping pre-close alert")
+            subject = f"Pre-Close — No signals | NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}%"
+
+        # Build signal section
+        signal_html = ""
+        if sma50_new_exits:
+            for t in sma50_new_exits:
+                s = sma50_exit_status[t]
+                label = TICKER_LABELS.get(t, t)
+                signal_html += f'<div style="background:rgba(239,68,68,0.12);padding:10px;border-radius:6px;margin-bottom:8px;border-left:3px solid #ef4444"><b style="color:#ef4444">EXIT — SELL {t} ({label}) → SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}</div>'
+        if sma50_new_entries:
+            for t in sma50_new_entries:
+                s = sma50_exit_status[t]
+                label = TICKER_LABELS.get(t, t)
+                signal_html += f'<div style="background:rgba(16,185,129,0.12);padding:10px;border-radius:6px;margin-bottom:8px;border-left:3px solid #10b981"><b style="color:#10b981">RE-ENTRY — BUY {t} ({label}) ← SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}</div>'
+        if sma50_watch:
+            for t, pct, block in sma50_watch:
+                label = TICKER_LABELS.get(t, t)
+                signal_html += f'<div style="background:rgba(245,158,11,0.12);padding:10px;border-radius:6px;margin-bottom:8px;border-left:3px solid #f59e0b"><b style="color:#f59e0b">WATCH — {t} ({label})</b> — {pct:+.1f}% from SMA50</div>'
+        if exited_tickers:
+            exited_list = ", ".join(exited_tickers)
+            signal_html += f'<div style="background:rgba(100,116,139,0.12);padding:10px;border-radius:6px;margin-bottom:8px;border-left:3px solid #64748b"><span style="color:#94a3b8">Positions in SHY:</span> <b>{exited_list}</b></div>'
+        if not signal_html:
+            signal_html = '<div style="background:rgba(16,185,129,0.12);padding:10px;border-radius:6px;margin-bottom:8px;border-left:3px solid #10b981"><span style="color:#10b981">All clear — no SMA50 signals</span></div>'
+
+        # Performance
+        today_color = "#10b981" if today_ret >= 0 else "#ef4444"
+        ytd_color = "#10b981" if ytd_ret >= 0 else "#ef4444"
+        mtd_ret_val = mtd_ret if 'mtd_ret' in dir() else 0
+        mtd_color = "#10b981" if mtd_ret_val >= 0 else "#ef4444"
+
+        html_body = f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
+            <h2 style="color:#f59e0b;margin-bottom:4px">Centinela v3 — Pre-Close Status</h2>
+            <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} — 2:00 PM NY (intraday)</p>
+            <div style="background:#0f172a;padding:16px;border-radius:8px;margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                    <span style="color:#94a3b8">NAV</span>
+                    <b style="font-size:18px">${nav_live[-1]:,.2f}</b>
+                </div>
+                <table style="width:100%;font-size:13px;color:#e2e8f0">
+                    <tr><td>Today</td><td style="text-align:right;color:{today_color};font-weight:bold">{today_ret:+.2f}%</td></tr>
+                    <tr><td>MTD</td><td style="text-align:right;color:{mtd_color};font-weight:bold">{mtd_ret_val:+.2f}%</td></tr>
+                    <tr><td>YTD</td><td style="text-align:right;color:{ytd_color};font-weight:bold">{ytd_ret:+.2f}%</td></tr>
+                </table>
+            </div>
+            <h3 style="color:#94a3b8;font-size:11px;text-transform:uppercase;margin-bottom:8px">SMA50 Signals</h3>
+            {signal_html}
+            <p style="margin-top:16px;font-size:10px;color:#475569">Based on intraday prices. Final confirmation at post-close email (3pm NY).</p>
+            <p style="font-size:10px;color:#475569">SFinance-alicIA | Centinela v3 Dual SMA</p>
+        </div>"""
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = GMAIL_SENDER
+        msg["To"] = GMAIL_SENDER
+        msg.attach(MIMEText(html_body, "html"))
+        try:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+                server.login(GMAIL_SENDER, gmail_pass)
+                server.sendmail(GMAIL_SENDER, EMAIL_RECIPIENTS, msg.as_string())
+            print(f"  Pre-close email sent to {len(EMAIL_RECIPIENTS)} recipients (BCC)")
+        except Exception as e:
+            print(f"  ! Email error: {e}")
     else:
-        print("\nPre-close check: no SMA50 signals. No email sent.")
+        print("  ! GMAIL_APP_PASSWORD not set — skipping pre-close email")
     print("\n=== Alert Mode Done ===")
     exit(0)
 
