@@ -80,15 +80,35 @@ CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "price_cac
 
 print(f"═══ Centinela v3 — Dual SMA — Live Dashboard {LIVE_YEAR} ═══\n")
 
+def _market_is_closed():
+    """True if NY markets are closed (after 16:05 ET or weekend)."""
+    from zoneinfo import ZoneInfo
+    ny = datetime.datetime.now(ZoneInfo("America/New_York"))
+    if ny.weekday() >= 5:
+        return True  # weekend
+    return ny.hour >= 16  # after 4pm ET
+
 def load_cache():
     if not os.path.exists(CACHE_FILE):
         return None
     try:
         with open(CACHE_FILE, "r") as f:
             cache = json.load(f)
-        if cache.get("date") == str(TODAY):
-            print("Using cached data (same day)...")
-            return cache
+        cached_date = cache.get("date")
+        last_price_date = cache["dates"][-1] if cache.get("dates") else None
+        # Cache is valid only if:
+        # 1. Saved today AND
+        # 2. Last price date is today (we have today's data) OR market hasn't closed yet
+        if cached_date == str(TODAY):
+            if last_price_date == str(TODAY):
+                print(f"Using cached data (today's close included, {last_price_date})...")
+                return cache
+            elif not _market_is_closed():
+                print(f"Using cached data (market still open, last: {last_price_date})...")
+                return cache
+            else:
+                print(f"Cache stale: last price {last_price_date}, market closed — re-downloading...")
+                return None
     except:
         pass
     return None
@@ -96,13 +116,14 @@ def load_cache():
 def save_cache(dates_list, data_dict):
     cache = {
         "date": str(TODAY),
+        "last_price_date": str(dates_list[-1]) if dates_list else "",
         "dates": [str(d) for d in dates_list],
         "prices": {t: [None if (isinstance(v, float) and np.isnan(v)) else v
                        for v in data_dict[t].tolist()] for t in data_dict},
     }
     with open(CACHE_FILE, "w") as f:
         json.dump(cache, f)
-    print(f"  Cache saved: {CACHE_FILE}")
+    print(f"  Cache saved: {CACHE_FILE} (last: {dates_list[-1]})")
 
 cached = load_cache()
 
