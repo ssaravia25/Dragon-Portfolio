@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Centinela v3 — Doble SMA — Live Dashboard (2026)
+Centinela v3 — Dual SMA — Live Dashboard (2026)
 Dual SMA system: SMA200 exposure filter + SMA50 intra-month exit signal.
 $10,000 initial capital. Daily email with SMA50 alerts + monthly rebalancing.
 ALERT_MODE=1 env var → pre-close lightweight run (skip HTML, only send alerts).
@@ -56,10 +56,10 @@ BLOCK_COLORS = {
 
 TICKER_LABELS = {
     "SPY": "US Large", "QQQ": "Nasdaq", "IWM": "Small Cap",
-    "EEM": "Emergentes", "VGK": "Europa", "EWY": "Korea",
-    "EWP": "Espana", "EWZ": "Brasil", "EPOL": "Polonia",
+    "EEM": "Emerging Mkts", "VGK": "Europe", "EWY": "Korea",
+    "EWP": "Spain", "EWZ": "Brazil", "EPOL": "Poland",
     "SHY": "1-3Y", "IEF": "7-10Y", "TLT": "20+Y", "TIP": "TIPS", "LQD": "IG Corp",
-    "GLD": "Oro", "SLV": "Plata", "CPER": "Cobre", "BTC-USD": "Bitcoin",
+    "GLD": "Gold", "SLV": "Silver", "CPER": "Copper", "BTC-USD": "Bitcoin",
     "BTAL": "Anti-Beta", "DBC": "Commodities",
 }
 
@@ -77,7 +77,7 @@ TICKER_COLORS = {
 # ═══════════════════════════════════════════════════════════════════
 CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "price_cache.json")
 
-print(f"═══ Centinela v3 — Doble SMA — Live Dashboard {LIVE_YEAR} ═══\n")
+print(f"═══ Centinela v3 — Dual SMA — Live Dashboard {LIVE_YEAR} ═══\n")
 
 def load_cache():
     if not os.path.exists(CACHE_FILE):
@@ -654,29 +654,29 @@ if ALERT_MODE:
         if gmail_pass:
             alert_parts = []
             if sma50_new_exits:
-                subject = f"PRE-CIERRE — VENDER {', '.join(sma50_new_exits)} MOC | Centinela v3"
+                subject = f"PRE-CLOSE — SELL {', '.join(sma50_new_exits)} MOC | Centinela v3"
                 for t in sma50_new_exits:
                     s = sma50_exit_status[t]
                     label = TICKER_LABELS.get(t, t)
-                    alert_parts.append(f'<b style="color:#ef4444">VENDER {t} ({label}) → SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}')
+                    alert_parts.append(f'<b style="color:#ef4444">SELL {t} ({label}) → SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}')
             elif sma50_new_entries:
-                subject = f"PRE-CIERRE — COMPRAR {', '.join(sma50_new_entries)} MOC | Centinela v3"
+                subject = f"PRE-CLOSE — BUY {', '.join(sma50_new_entries)} MOC | Centinela v3"
                 for t in sma50_new_entries:
                     s = sma50_exit_status[t]
                     label = TICKER_LABELS.get(t, t)
-                    alert_parts.append(f'<b style="color:#10b981">COMPRAR {t} ({label}) ← SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}')
+                    alert_parts.append(f'<b style="color:#10b981">BUY {t} ({label}) ← SHY</b> | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f}')
             else:
-                subject = f"VIGILANCIA — Activos cerca de SMA50 | Centinela v3"
+                subject = f"WATCH — Assets near SMA50 | Centinela v3"
                 for t, pct, block in sma50_watch:
                     label = TICKER_LABELS.get(t, t)
-                    alert_parts.append(f'<b style="color:#f59e0b">{t} ({label})</b> — {pct:+.1f}% de SMA50')
+                    alert_parts.append(f'<b style="color:#f59e0b">{t} ({label})</b> — {pct:+.1f}% from SMA50')
             body_rows = "<br>".join(alert_parts)
             html_body = f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
-                <h2 style="color:#f59e0b;margin-bottom:4px">Centinela v3 — Alerta Pre-Cierre</h2>
-                <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} — ~30min antes del cierre</p>
+                <h2 style="color:#f59e0b;margin-bottom:4px">Centinela v3 — Pre-Close Alert</h2>
+                <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} — ~30min before close</p>
                 <div style="background:#0f172a;padding:16px;border-radius:6px;font-size:13px;line-height:1.8">{body_rows}</div>
-                <p style="margin-top:16px;font-size:10px;color:#475569">Basado en precios intraday. Confirmar antes de ejecutar MOC.</p>
-                <p style="font-size:10px;color:#475569">SFinance-alicIA | Centinela v3 Doble SMA</p>
+                <p style="margin-top:16px;font-size:10px;color:#475569">Based on intraday prices. Confirm before executing MOC.</p>
+                <p style="font-size:10px;color:#475569">SFinance-alicIA | Centinela v3 Dual SMA</p>
             </div>"""
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
@@ -804,7 +804,7 @@ def build_ytd_chart():
         svg += f'<line x1="{ml}" y1="{yp:.0f}" x2="{vw-mr}" y2="{yp:.0f}" stroke="rgba(148,163,184,{op})" stroke-width="{w}"/>'
         svg += f'<text x="{ml-5}" y="{yp:.0f}" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">{pct:+.0f}%</text>'
         pct += step
-    month_names = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+    month_names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
     seen = set()
     for i, d in enumerate(dates_live):
         if d.month not in seen:
@@ -886,7 +886,7 @@ def signal_blocks_html():
         if block == "LongVol":
             exp_txt = ""
         if exp_txt:
-            html += f'<div class="signal-exp">Exposicion {exp_txt}</div>'
+            html += f'<div class="signal-exp">Exposure {exp_txt}</div>'
         html += '</div>'
     html += '</div>'
     return html
@@ -953,7 +953,7 @@ def positions_table_html():
         rows += f'''<tr style="background:rgba(148,163,184,0.08);border-top:2px solid #334155;">
             <td style="color:#94a3b8;font-weight:700">SHY</td>
             <td>Cash (1-3Y)</td>
-            <td>Proteccion</td>
+            <td>Protection</td>
             <td class="num">{cash_pct*100:.1f}%</td>
             <td class="num" style="color:#94a3b8;font-weight:700">{shy_real_weight:.1f}%</td>
             <td class="num">{int(shy_shares_total)}</td>
@@ -994,46 +994,46 @@ def sma50_alert_html():
     html = ""
     if sma50_new_exits:
         html += '<div class="alert-banner alert-exit">'
-        html += '<div class="alert-title">SENAL DE SALIDA HOY — Ejecutar MOC</div>'
+        html += '<div class="alert-title">EXIT SIGNAL TODAY — Execute MOC</div>'
         for t in sma50_new_exits:
             s = sma50_exit_status[t]
             label = TICKER_LABELS.get(t, t)
-            html += f'<div class="alert-action">VENDER {t} ({label}) → SHY'
+            html += f'<div class="alert-action">SELL {t} ({label}) → SHY'
             if s["pct_from_sma"] is not None:
-                html += f' | Precio: ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f} ({s["pct_from_sma"]:+.1f}%)'
+                html += f' | Price: ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f} ({s["pct_from_sma"]:+.1f}%)'
             html += '</div>'
         html += '</div>'
     if sma50_new_entries:
         html += '<div class="alert-banner alert-entry">'
-        html += '<div class="alert-title">SENAL DE REENTRADA HOY — Ejecutar MOC</div>'
+        html += '<div class="alert-title">RE-ENTRY SIGNAL TODAY — Execute MOC</div>'
         for t in sma50_new_entries:
             s = sma50_exit_status[t]
             label = TICKER_LABELS.get(t, t)
-            html += f'<div class="alert-action">COMPRAR {t} ({label}) ← SHY'
+            html += f'<div class="alert-action">BUY {t} ({label}) ← SHY'
             if s["pct_from_sma"] is not None:
-                html += f' | Precio: ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f} ({s["pct_from_sma"]:+.1f}%)'
+                html += f' | Price: ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f} ({s["pct_from_sma"]:+.1f}%)'
             html += '</div>'
         html += '</div>'
     if sma50_watch:
         html += '<div class="alert-banner alert-watch">'
-        html += '<div class="alert-title">VIGILANCIA SMA50 — Activos cerca del umbral (&lt;2%)</div>'
+        html += '<div class="alert-title">SMA50 WATCH — Assets near threshold (&lt;2%)</div>'
         for t, pct, block in sma50_watch:
             label = TICKER_LABELS.get(t, t)
-            html += f'<div class="alert-action">{t} ({label}) — {pct:+.1f}% de SMA50</div>'
+            html += f'<div class="alert-action">{t} ({label}) — {pct:+.1f}% from SMA50</div>'
         html += '</div>'
     if exited_tickers:
         html += '<div class="alert-banner alert-info">'
-        html += '<div class="alert-title">POSICIONES EN SHY (salidas por SMA50)</div>'
+        html += '<div class="alert-title">POSITIONS IN SHY (SMA50 exits)</div>'
         for t in exited_tickers:
             s = sma50_exit_status[t]
             label = TICKER_LABELS.get(t, t)
             pct_txt = f'{s["pct_from_sma"]:+.1f}%' if s["pct_from_sma"] is not None else "—"
-            html += f'<div class="alert-action">{t} ({label}) — {pct_txt} bajo SMA50</div>'
+            html += f'<div class="alert-action">{t} ({label}) — {pct_txt} below SMA50</div>'
         html += '</div>'
     if not sma50_new_exits and not sma50_new_entries and not exited_tickers and not sma50_watch:
         html += '<div class="alert-banner alert-ok">'
-        html += '<div class="alert-title">SMA50 — Sin senales activas</div>'
-        html += '<div class="alert-action">Todos los activos sobre SMA50. Sin acciones requeridas.</div>'
+        html += '<div class="alert-title">SMA50 — No active signals</div>'
+        html += '<div class="alert-action">All assets above SMA50. No action required.</div>'
         html += '</div>'
     return html
 
@@ -1058,8 +1058,8 @@ def trade_blotter_html():
         sell_amount = n_sh * price
         shy_buy = math.floor(sell_amount / shy_price_now) if shy_price_now > 0 else 0
         label = TICKER_LABELS.get(t, t)
-        orders.append(("VENDER", t, label, n_sh, price, sell_amount, f"SMA50 Exit → SHY"))
-        orders.append(("COMPRAR", "SHY", "Cash 1-3Y", shy_buy, shy_price_now, shy_buy * shy_price_now, f"Destino de {t}"))
+        orders.append(("SELL", t, label, n_sh, price, sell_amount, f"SMA50 Exit → SHY"))
+        orders.append(("BUY", "SHY", "Cash 1-3Y", shy_buy, shy_price_now, shy_buy * shy_price_now, f"From {t} exit"))
 
     # SMA50 re-entry orders: sell SHY, buy ticker back
     for t in sma50_new_entries:
@@ -1076,8 +1076,8 @@ def trade_blotter_html():
         n_buy = math.floor(alloc / price) if price > 0 else 0
         shy_sell = math.ceil(alloc / shy_price_now) if shy_price_now > 0 else 0
         label = TICKER_LABELS.get(t, t)
-        orders.append(("VENDER", "SHY", "Cash 1-3Y", shy_sell, shy_price_now, shy_sell * shy_price_now, f"Fondeo para {t}"))
-        orders.append(("COMPRAR", t, label, n_buy, price, n_buy * price, f"SMA50 Re-entry"))
+        orders.append(("SELL", "SHY", "Cash 1-3Y", shy_sell, shy_price_now, shy_sell * shy_price_now, f"Funding for {t}"))
+        orders.append(("BUY", t, label, n_buy, price, n_buy * price, f"SMA50 Re-entry"))
 
     # Monthly rebalance orders
     if is_rebal_day and prev_rebal:
@@ -1094,28 +1094,28 @@ def trade_blotter_html():
                 label = TICKER_LABELS.get(t, t)
                 # Estimate shares from prev allocation
                 prev_sh = shares_map.get(t, 0)
-                orders.append(("VENDER", t, label, prev_sh, price, prev_sh * price, f"Sale del ranking {BLOCK_LABELS.get(block, block)}"))
+                orders.append(("SELL", t, label, prev_sh, price, prev_sh * price, f"Dropped from {BLOCK_LABELS.get(block, block)}"))
             for t in entries:
                 price = float(price_data[t][-1])
                 label = TICKER_LABELS.get(t, t)
                 alloc = nav_now * target_w
                 n_buy = math.floor(alloc / price) if price > 0 else 0
-                orders.append(("COMPRAR", t, label, n_buy, price, n_buy * price, f"Entra al ranking {BLOCK_LABELS.get(block, block)}"))
+                orders.append(("BUY", t, label, n_buy, price, n_buy * price, f"New pick in {BLOCK_LABELS.get(block, block)}"))
 
     if not orders:
         return f'''<div class="alert-banner alert-ok">
-            <div class="alert-title">ORDENES DE EJECUCION</div>
-            <div class="alert-action">Sin ordenes pendientes. Proxima revision: {next_rebal.strftime("%d/%m/%Y")} (rebalanceo) o senal SMA50 intradiaria.</div>
+            <div class="alert-title">TRADE ORDERS</div>
+            <div class="alert-action">No pending orders. Next review: {next_rebal.strftime("%Y-%m-%d")} (rebalance) or intraday SMA50 signal.</div>
         </div>'''
 
     # Build order table
     html = '<div style="margin-bottom:20px">'
-    html += '<div class="section-title">Ordenes de Ejecucion — MOC (Market on Close)</div>'
+    html += '<div class="section-title">Trade Orders — MOC (Market on Close)</div>'
     html += '<table class="data-table">'
-    html += '<tr><th>Accion</th><th>Ticker</th><th>Nombre</th><th class="num">Acciones</th><th class="num">Precio Aprox</th><th class="num">Monto Est.</th><th>Motivo</th></tr>'
+    html += '<tr><th>Action</th><th>Ticker</th><th>Name</th><th class="num">Shares</th><th class="num">Est. Price</th><th class="num">Est. Amount</th><th>Reason</th></tr>'
     for action, ticker, name, shares, price, amount, reason in orders:
-        a_clr = "#ef4444" if action == "VENDER" else "#10b981"
-        a_bg = "rgba(239,68,68,0.08)" if action == "VENDER" else "rgba(16,185,129,0.08)"
+        a_clr = "#ef4444" if action == "SELL" else "#10b981"
+        a_bg = "rgba(239,68,68,0.08)" if action == "SELL" else "rgba(16,185,129,0.08)"
         t_clr = TICKER_COLORS.get(ticker, "#94a3b8")
         pfmt = f"${price:,.0f}" if ticker == "BTC-USD" else f"${price:.2f}"
         sh_fmt = f"{shares:.6f}" if ticker == "BTC-USD" else f"{int(shares)}"
@@ -1137,37 +1137,37 @@ def operational_status_html():
     has_signals = bool(sma50_new_exits or sma50_new_entries)
 
     if has_signals and is_rebal_day:
-        status = "ACCION DOBLE"
+        status = "DOUBLE ACTION"
         status_clr = "#ef4444"
-        msg = "Senales SMA50 + Rebalanceo mensual. Ejecutar TODAS las ordenes MOC antes del cierre."
+        msg = "SMA50 signals + Monthly rebalance. Execute ALL MOC orders before close."
         banner_cls = "alert-exit"
     elif has_signals:
-        status = "ACCION REQUERIDA"
+        status = "ACTION REQUIRED"
         status_clr = "#ef4444"
-        msg = "Senal SMA50 detectada. Ejecutar ordenes MOC antes del cierre (16:00 ET)."
+        msg = "SMA50 signal detected. Execute MOC orders before close (16:00 ET)."
         banner_cls = "alert-exit"
     elif is_rebal_day:
-        status = "REBALANCEO"
+        status = "REBALANCE"
         status_clr = "#f59e0b"
-        msg = "Primer dia del mes. Ejecutar rotacion mensual MOC."
+        msg = "First day of month. Execute monthly rotation MOC."
         banner_cls = "alert-watch"
     elif days_to_rebal <= 3:
-        status = "PREPARAR"
+        status = "PREPARE"
         status_clr = "#f59e0b"
-        msg = f"Rebalanceo en {days_to_rebal} dias ({next_rebal.strftime('%d/%m')}). Revisar liquidez y posiciones."
+        msg = f"Rebalance in {days_to_rebal} days ({next_rebal.strftime('%d/%m')}). Review liquidity and positions."
         banner_cls = "alert-watch"
     else:
-        status = "MONITOREAR"
+        status = "MONITOR"
         status_clr = "#10b981"
-        msg = "Sin accion requerida. Monitorear SMA50 watch list."
+        msg = "No action required. Monitor SMA50 watch list."
         banner_cls = "alert-ok"
 
     protocol = '''<div style="margin-top:8px;font-size:10px;color:#64748b;line-height:1.6">
-        <strong style="color:#94a3b8">Protocolo:</strong>
-        16:00 ET → Revisar dashboard (auto-update) |
-        Senal SMA50 → Ejecutar MOC mismo dia |
-        Rebal mensual → Rotar el 1er dia del mes MOC |
-        Email → Recibes alerta pre-cierre si hay senal
+        <strong style="color:#94a3b8">Protocol:</strong>
+        16:00 ET → Review dashboard (auto-update) |
+        SMA50 signal → Execute MOC same day |
+        Monthly rebal → Rotate on 1st of month MOC |
+        Email → Pre-close alert if signal detected
     </div>'''
 
     return f'''<div class="alert-banner {banner_cls}" style="margin-bottom:16px">
@@ -1198,7 +1198,7 @@ def benchmark_table_html():
     return f'''<table class="data-table" style="max-width:600px">
         <tr><th></th><th class="num" style="color:#06b6d4">Centinela v3</th><th class="num" style="color:#3b82f6">SPY</th><th class="num" style="color:#f59e0b">60/40</th></tr>
         {row("YTD", metrics_dragon["ytd"], metrics_spy["ytd"], metrics_6040["ytd"])}
-        {row("Volatilidad", metrics_dragon["vol"], metrics_spy["vol"], metrics_6040["vol"], higher_better=False)}
+        {row("Volatility", metrics_dragon["vol"], metrics_spy["vol"], metrics_6040["vol"], higher_better=False)}
         {row("Sharpe", metrics_dragon["sharpe"], metrics_spy["sharpe"], metrics_6040["sharpe"], is_pct=False)}
         {row("Sortino", metrics_dragon["sortino"], metrics_spy["sortino"], metrics_6040["sortino"], is_pct=False)}
         {row("Max Drawdown", metrics_dragon["mdd"], metrics_spy["mdd"], metrics_6040["mdd"])}
@@ -1219,7 +1219,7 @@ def sma200_cards_html():
         color = TICKER_COLORS.get(t, "#6b7280")
         price = price_data[t][-1]
         sma_val = sma200_values[t][-1]
-        status = "SOBRE" if above else "BAJO"
+        status = "ABOVE" if above else "BELOW"
         status_clr = "#10b981" if above else "#ef4444"
         icon = "▲" if above else "▼"
         pfmt = f"${price:,.2f}" if t != "BTC-USD" else f"${price:,.2f}"
@@ -1279,7 +1279,7 @@ mtd_sign = "+" if mtd_ret >= 0 else ""
 ytd_sign = "+" if ytd_ret >= 0 else ""
 
 html = f'''<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1389,8 +1389,8 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
 <div class="container">
 
   <div class="tabs">
-    <span class="tab active" onclick="switchTab(0)">Panel Live</span>
-    <span class="tab" onclick="switchTab(1)">Filosofia & Backtest</span>
+    <span class="tab active" onclick="switchTab(0)">Live Panel</span>
+    <span class="tab" onclick="switchTab(1)">Philosophy & Backtest</span>
   </div>
 
   <div id="tab-live" class="tab-panel active">
@@ -1398,12 +1398,12 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   <div class="header">
     <div class="header-left">
       <h1><span>Centinela</span> v3 <span class="live-badge">LIVE</span></h1>
-      <div class="subtitle">Doble SMA (SMA200 + Exit SMA{SMA_EXIT}) | Top-{N_SELECT} Momentum {MOM_LOOKBACK}d | Rebalanceo Mensual | ${INITIAL_CAPITAL:,} inicial</div>
+      <div class="subtitle">Dual SMA (SMA200 + Exit SMA{SMA_EXIT}) | Top-{N_SELECT} Momentum {MOM_LOOKBACK}d | Monthly Rebalance | ${INITIAL_CAPITAL:,} initial</div>
     </div>
     <div class="header-right">
       <strong>SFinance-alicIA</strong><br>
-      Senal: {dates_live[-1].strftime("%Y-%m-%d")}<br>
-      Proximo: {next_rebal.strftime("%Y-%m-%d")} ({days_to_rebal}d)
+      Signal: {dates_live[-1].strftime("%Y-%m-%d")}<br>
+      Next: {next_rebal.strftime("%Y-%m-%d")} ({days_to_rebal}d)
     </div>
   </div>
 
@@ -1415,13 +1415,13 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
 
   <div class="nav-card">
     <div class="nav-main">
-      <div class="nav-label">Valor del Portafolio</div>
+      <div class="nav-label">Portfolio Value</div>
       <div class="nav-value">${nav_live[-1]:,.2f}</div>
-      <div class="nav-change {pct_cls(today_ret)}">{today_sign}{today_ret:.2f}% hoy (${abs(today_dollar):,.0f})</div>
+      <div class="nav-change {pct_cls(today_ret)}">{today_sign}{today_ret:.2f}% today (${abs(today_dollar):,.0f})</div>
     </div>
     <div class="nav-kpis">
       <div class="nav-kpi">
-        <div class="nav-kpi-label">Hoy</div>
+        <div class="nav-kpi-label">Today</div>
         <div class="nav-kpi-value {pct_cls(today_ret)}">{today_sign}{today_ret:.2f}%</div>
         <div class="nav-kpi-sub">{"-" if today_dollar < 0 else ""}${abs(today_dollar):,.0f}</div>
       </div>
@@ -1436,59 +1436,59 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
         <div class="nav-kpi-sub">{"-" if ytd_dollar < 0 else "+"}${abs(ytd_dollar):,.0f}</div>
       </div>
       <div class="nav-kpi">
-        <div class="nav-kpi-label">Desde Inicio</div>
+        <div class="nav-kpi-label">Since Inception</div>
         <div class="nav-kpi-value {pct_cls(ytd_ret)}">{ytd_sign}{ytd_ret:.2f}%</div>
         <div class="nav-kpi-sub">{"-" if ytd_dollar < 0 else "+"}${abs(ytd_dollar):,.0f}</div>
       </div>
       <div class="nav-kpi">
         <div class="nav-kpi-label">Drawdown</div>
         <div class="nav-kpi-value neg">{max_dd:.1f}%</div>
-        <div class="nav-kpi-sub">actual: {curr_dd:.1f}%</div>
+        <div class="nav-kpi-sub">current: {curr_dd:.1f}%</div>
       </div>
     </div>
   </div>
 
-  <div class="section-title">Evolucion del Portafolio — Desde Inicio</div>
+  <div class="section-title">Portfolio Evolution — Since Inception</div>
   <div class="chart-container">{build_nav_chart()}</div>
 
   <div class="exp-strip">
     <div class="exp-item"><div class="exp-label">Equity Exp</div><div class="exp-value">{curr_exp.get("Equity",1):.0%}</div><div class="exp-sub">SMA200 filter</div></div>
     <div class="exp-item"><div class="exp-label">Bonds Exp</div><div class="exp-value">{curr_exp.get("Bonds",1):.0%}</div><div class="exp-sub">SMA200 filter</div></div>
     <div class="exp-item"><div class="exp-label">Hard Assets Exp</div><div class="exp-value">{curr_exp.get("HardAssets",1):.0%}</div><div class="exp-sub">SMA200 filter</div></div>
-    <div class="exp-item"><div class="exp-label">Long Vol</div><div class="exp-value" style="font-size:14px;color:#ef4444">BTAL</div><div class="exp-sub">fijo 21%</div></div>
+    <div class="exp-item"><div class="exp-label">Long Vol</div><div class="exp-value" style="font-size:14px;color:#ef4444">BTAL</div><div class="exp-sub">fixed 21%</div></div>
     <div class="exp-item"><div class="exp-label">Cmdty Trend</div><div class="exp-value">{cmdty_exp:.0%}</div><div class="exp-sub">DBC SMA200 gate</div></div>
-    <div class="exp-item"><div class="exp-label">SMA50 Salidas</div><div class="exp-value" style="color:{'#ef4444' if exited_tickers else '#10b981'}">{len(exited_tickers)}</div><div class="exp-sub">en SHY</div></div>
-    <div class="exp-item"><div class="exp-label">Posiciones</div><div class="exp-value" style="color:#f1f5f9">{n_positions}</div><div class="exp-sub">tickers activos</div></div>
-    <div class="exp-item"><div class="exp-label">Cash (SHY)</div><div class="exp-value" style="color:#f1f5f9">{cash_pct:.0%}</div><div class="exp-sub">capital protegido</div></div>
-    <div class="exp-item"><div class="exp-label">Proximo Rebal</div><div class="exp-value" style="color:#f1f5f9">{days_to_rebal}d</div><div class="exp-sub">{next_rebal.strftime("%Y-%m-%d")}</div></div>
+    <div class="exp-item"><div class="exp-label">SMA50 Exits</div><div class="exp-value" style="color:{'#ef4444' if exited_tickers else '#10b981'}">{len(exited_tickers)}</div><div class="exp-sub">in SHY</div></div>
+    <div class="exp-item"><div class="exp-label">Positions</div><div class="exp-value" style="color:#f1f5f9">{n_positions}</div><div class="exp-sub">active tickers</div></div>
+    <div class="exp-item"><div class="exp-label">Cash (SHY)</div><div class="exp-value" style="color:#f1f5f9">{cash_pct:.0%}</div><div class="exp-sub">protected capital</div></div>
+    <div class="exp-item"><div class="exp-label">Next Rebal</div><div class="exp-value" style="color:#f1f5f9">{days_to_rebal}d</div><div class="exp-sub">{next_rebal.strftime("%Y-%m-%d")}</div></div>
   </div>
 
-  <div class="section-title">Senales por Bloque — Ultima Senal</div>
+  <div class="section-title">Signals by Block — Latest Signal</div>
   {signal_blocks_html()}
 
-  <div class="section-title">Posiciones Actuales — Rebal {rebal_date.strftime("%d/%m/%Y")}</div>
+  <div class="section-title">Current Positions — Rebal {rebal_date.strftime("%d/%m/%Y")}</div>
   <div class="pos-donut-grid">
     <div style="overflow-x:auto">
       <table class="data-table">
-        <tr><th>Ticker</th><th>Nombre</th><th>Bloque</th><th class="num">Obj.</th><th class="num">Real</th><th class="num">Acciones</th><th class="num">Valor</th><th class="num">Precio</th><th class="num">Mom 126d</th><th class="num">SMA200</th><th class="num">SMA50 Exit</th></tr>
+        <tr><th>Ticker</th><th>Name</th><th>Block</th><th class="num">Target</th><th class="num">Actual</th><th class="num">Shares</th><th class="num">Value</th><th class="num">Price</th><th class="num">Mom 126d</th><th class="num">SMA200</th><th class="num">SMA50 Exit</th></tr>
         {positions_table_html()}
       </table>
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <div class="section-title" style="text-align:center">Distribucion por Bloque</div>
+      <div class="section-title" style="text-align:center">Block Distribution</div>
       {build_donut()}
     </div>
   </div>
 
-  <div class="section-title">Estado SMA200 — Todos los Activos</div>
+  <div class="section-title">SMA200 Status — All Assets</div>
   <div class="sma-grid">
     {sma200_cards_html()}
   </div>
 
-  <div class="section-title">Evolutivo YTD {LIVE_YEAR} — Todos los Activos (Base 0%)</div>
+  <div class="section-title">YTD Evolution {LIVE_YEAR} — All Assets (Base 0%)</div>
   <div class="chart-container" style="border:1px solid #334155;border-radius:8px;padding:12px">{build_ytd_chart()}</div>
   <div style="margin-top:6px;font-size:9px;color:#64748b">
-    Retorno acumulado desde el 1 de enero {LIVE_YEAR}. <span style="color:#06b6d4;font-weight:700">Linea cyan = Centinela v3.</span>
+    Cumulative return since January 1, {LIVE_YEAR}. <span style="color:#06b6d4;font-weight:700">Cyan line = Centinela v3.</span>
   </div>
 
   <div style="margin-top:24px">
@@ -1497,16 +1497,16 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div style="margin-top:24px">
-    <div class="section-title">Historial de Rebalanceos</div>
+    <div class="section-title">Rebalancing History</div>
     <table class="data-table">
-      <tr><th>Fecha</th><th>Equity</th><th>Bonds</th><th>Hard Assets</th><th class="num">Eq Exp</th><th class="num">HA Exp</th><th class="num">Cmdty</th></tr>
+      <tr><th>Date</th><th>Equity</th><th>Bonds</th><th>Hard Assets</th><th class="num">Eq Exp</th><th class="num">HA Exp</th><th class="num">Cmdty</th></tr>
       {rebal_history_html()}
     </table>
   </div>
 
   <div class="footer">
-    <span>SFinance-alicIA | Centinela v3 LIVE | Solo fines informativos, no es asesoria financiera</span>
-    <span>Senal: {dates_live[-1].strftime("%Y-%m-%d")} | {n_positions} posiciones | {N_live} dias de NAV | SMA200 min {MIN_EXPOSURE:.0%}</span>
+    <span>SFinance-alicIA | Centinela v3 LIVE | For informational purposes only, not financial advice</span>
+    <span>Signal: {dates_live[-1].strftime("%Y-%m-%d")} | {n_positions} positions | {N_live} NAV days | SMA200 min {MIN_EXPOSURE:.0%}</span>
   </div>
 
   </div><!-- end tab-live -->
@@ -1566,45 +1566,45 @@ def is_new_rebalancing():
 def build_sma50_email_section():
     """SMA50 signal section for daily email."""
     if not sma50_new_exits and not sma50_new_entries and not exited_tickers and not sma50_watch:
-        return '<p style="color:#10b981;font-size:13px">SMA50: todos los activos OK. Sin acciones.</p>'
+        return '<p style="color:#10b981;font-size:13px">SMA50: All assets OK. No action required.</p>'
     html = ""
     if sma50_new_exits:
         html += '<div style="background:rgba(239,68,68,0.1);padding:12px;border-radius:6px;margin-bottom:10px;border-left:3px solid #ef4444">'
-        html += '<p style="color:#ef4444;font-weight:bold;font-size:12px;margin-bottom:6px">SENAL DE SALIDA — Ejecutar MOC</p>'
+        html += '<p style="color:#ef4444;font-weight:bold;font-size:12px;margin-bottom:6px">EXIT SIGNAL — Execute MOC</p>'
         for t in sma50_new_exits:
             s = sma50_exit_status[t]
             label = TICKER_LABELS.get(t, t)
-            html += f'<p style="font-family:monospace;font-size:13px;color:#e2e8f0">VENDER {t} ({label}) → SHY'
+            html += f'<p style="font-family:monospace;font-size:13px;color:#e2e8f0">SELL {t} ({label}) → SHY'
             if s["pct_from_sma"] is not None:
                 html += f' | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f} ({s["pct_from_sma"]:+.1f}%)'
             html += '</p>'
         html += '</div>'
     if sma50_new_entries:
         html += '<div style="background:rgba(16,185,129,0.1);padding:12px;border-radius:6px;margin-bottom:10px;border-left:3px solid #10b981">'
-        html += '<p style="color:#10b981;font-weight:bold;font-size:12px;margin-bottom:6px">SENAL DE REENTRADA — Ejecutar MOC</p>'
+        html += '<p style="color:#10b981;font-weight:bold;font-size:12px;margin-bottom:6px">RE-ENTRY SIGNAL — Execute MOC</p>'
         for t in sma50_new_entries:
             s = sma50_exit_status[t]
             label = TICKER_LABELS.get(t, t)
-            html += f'<p style="font-family:monospace;font-size:13px;color:#e2e8f0">COMPRAR {t} ({label}) ← SHY'
+            html += f'<p style="font-family:monospace;font-size:13px;color:#e2e8f0">BUY {t} ({label}) ← SHY'
             if s["pct_from_sma"] is not None:
                 html += f' | ${s["price"]:.2f} | SMA50: ${s["sma50"]:.2f} ({s["pct_from_sma"]:+.1f}%)'
             html += '</p>'
         html += '</div>'
     if exited_tickers:
         html += '<div style="background:rgba(100,116,139,0.1);padding:12px;border-radius:6px;margin-bottom:10px;border-left:3px solid #64748b">'
-        html += '<p style="color:#94a3b8;font-weight:bold;font-size:12px;margin-bottom:6px">POSICIONES EN SHY</p>'
+        html += '<p style="color:#94a3b8;font-weight:bold;font-size:12px;margin-bottom:6px">POSITIONS IN SHY</p>'
         for t in exited_tickers:
             s = sma50_exit_status[t]
             label = TICKER_LABELS.get(t, t)
             pct = f'{s["pct_from_sma"]:+.1f}%' if s["pct_from_sma"] is not None else "—"
-            html += f'<p style="font-size:12px;color:#e2e8f0">{t} ({label}) — {pct} bajo SMA50</p>'
+            html += f'<p style="font-size:12px;color:#e2e8f0">{t} ({label}) — {pct} below SMA50</p>'
         html += '</div>'
     if sma50_watch:
         html += '<div style="background:rgba(245,158,11,0.1);padding:12px;border-radius:6px;margin-bottom:10px;border-left:3px solid #f59e0b">'
-        html += '<p style="color:#f59e0b;font-weight:bold;font-size:12px;margin-bottom:6px">VIGILANCIA (&lt;2% de SMA50)</p>'
+        html += '<p style="color:#f59e0b;font-weight:bold;font-size:12px;margin-bottom:6px">WATCH LIST (&lt;2% from SMA50)</p>'
         for t, pct, block in sma50_watch:
             label = TICKER_LABELS.get(t, t)
-            html += f'<p style="font-size:12px;color:#e2e8f0">{t} ({label}) — {pct:+.1f}% de SMA50</p>'
+            html += f'<p style="font-size:12px;color:#e2e8f0">{t} ({label}) — {pct:+.1f}% from SMA50</p>'
         html += '</div>'
     return html
 
@@ -1624,16 +1624,16 @@ def build_rebal_section():
                 if exited_p: changes_html += " " + " ".join(f'<span style="color:#ef4444">-{t}</span>' for t in exited_p)
                 changes_html += "</p>"
     if not changes_html:
-        changes_html = "<p>Sin cambios en posiciones.</p>"
+        changes_html = "<p>No position changes.</p>"
     pos_rows = ""
     for block in UNIVERSES:
         picks = last_rebal[block]["picks"]
         bname = BLOCK_LABELS.get(block, block)
         pos_rows += f'<tr><td style="font-weight:bold;color:#06b6d4;padding:6px">{bname}</td><td style="padding:6px">{", ".join(picks)}</td></tr>'
-    return f"""<h3 style="color:#f59e0b;font-size:14px;margin:16px 0 8px">Rebalanceo Mensual</h3>
-        <h4 style="color:#94a3b8;font-size:11px;text-transform:uppercase;margin-bottom:8px">Cambios vs Mes Anterior</h4>
+    return f"""<h3 style="color:#f59e0b;font-size:14px;margin:16px 0 8px">Monthly Rebalance</h3>
+        <h4 style="color:#94a3b8;font-size:11px;text-transform:uppercase;margin-bottom:8px">Changes vs Prior Month</h4>
         <div style="background:#0f172a;padding:12px;border-radius:6px;margin-bottom:12px;font-size:13px">{changes_html}</div>
-        <h4 style="color:#94a3b8;font-size:11px;text-transform:uppercase;margin-bottom:8px">Posiciones</h4>
+        <h4 style="color:#94a3b8;font-size:11px;text-transform:uppercase;margin-bottom:8px">Positions</h4>
         <table style="width:100%;font-size:13px;background:#0f172a;border-radius:6px;border-collapse:collapse;color:#e2e8f0">{pos_rows}</table>"""
 
 def build_trade_blotter_email():
@@ -1648,8 +1648,8 @@ def build_trade_blotter_email():
         sell_amt = n_sh * price
         shy_buy = math.floor(sell_amt / shy_price_now) if shy_price_now > 0 else 0
         label = TICKER_LABELS.get(t, t)
-        orders.append(("VENDER", t, label, n_sh, price, sell_amt))
-        orders.append(("COMPRAR", "SHY", "Cash 1-3Y", shy_buy, shy_price_now, shy_buy * shy_price_now))
+        orders.append(("SELL", t, label, n_sh, price, sell_amt))
+        orders.append(("BUY", "SHY", "Cash 1-3Y", shy_buy, shy_price_now, shy_buy * shy_price_now))
     for t in sma50_new_entries:
         price = float(price_data[t][-1])
         for block in EXIT_BLOCKS:
@@ -1661,52 +1661,98 @@ def build_trade_blotter_email():
                 n_buy = math.floor(alloc / price) if price > 0 else 0
                 shy_sell = math.ceil(alloc / shy_price_now) if shy_price_now > 0 else 0
                 label = TICKER_LABELS.get(t, t)
-                orders.append(("VENDER", "SHY", "Cash 1-3Y", shy_sell, shy_price_now, shy_sell * shy_price_now))
-                orders.append(("COMPRAR", t, label, n_buy, price, n_buy * price))
+                orders.append(("SELL", "SHY", "Cash 1-3Y", shy_sell, shy_price_now, shy_sell * shy_price_now))
+                orders.append(("BUY", t, label, n_buy, price, n_buy * price))
                 break
     if not orders:
         return ""
-    html = '<h3 style="color:#f59e0b;font-size:12px;text-transform:uppercase;margin:16px 0 8px">Ordenes a Ejecutar — MOC</h3>'
+    html = '<h3 style="color:#f59e0b;font-size:12px;text-transform:uppercase;margin:16px 0 8px">Orders to Execute — MOC</h3>'
     html += '<table style="width:100%;font-size:12px;background:#0f172a;border-radius:6px;border-collapse:collapse;color:#e2e8f0">'
-    html += '<tr style="color:#64748b;font-size:10px"><th style="padding:8px;text-align:left">Accion</th><th style="padding:8px">Ticker</th><th style="padding:8px;text-align:right">Acciones</th><th style="padding:8px;text-align:right">Precio</th><th style="padding:8px;text-align:right">Monto</th></tr>'
+    html += '<tr style="color:#64748b;font-size:10px"><th style="padding:8px;text-align:left">Action</th><th style="padding:8px">Ticker</th><th style="padding:8px;text-align:right">Shares</th><th style="padding:8px;text-align:right">Price</th><th style="padding:8px;text-align:right">Amount</th></tr>'
     for action, ticker, name, shares, price, amount in orders:
-        a_clr = "#ef4444" if action == "VENDER" else "#10b981"
+        a_clr = "#ef4444" if action == "SELL" else "#10b981"
         sh_fmt = f"{shares:.6f}" if ticker == "BTC-USD" else f"{int(shares)}"
         pfmt = f"${price:,.0f}" if ticker == "BTC-USD" else f"${price:.2f}"
         html += f'<tr><td style="padding:6px 8px;color:{a_clr};font-weight:bold">{action}</td><td style="padding:6px 8px;font-weight:bold">{ticker} <span style="color:#64748b;font-weight:normal">({name})</span></td><td style="padding:6px 8px;text-align:right">{sh_fmt}</td><td style="padding:6px 8px;text-align:right">{pfmt}</td><td style="padding:6px 8px;text-align:right">${amount:,.0f}</td></tr>'
     html += '</table>'
     return html
 
+def build_portfolio_email_section():
+    """Full portfolio positions table for email."""
+    tbl = '<h3 style="color:#94a3b8;font-size:12px;text-transform:uppercase;margin:16px 0 8px">Portfolio Holdings</h3>'
+    tbl += '<table style="width:100%;font-size:11px;background:#0f172a;border-radius:6px;border-collapse:collapse;color:#e2e8f0">'
+    tbl += '<tr style="color:#64748b;font-size:9px;text-transform:uppercase"><th style="padding:6px;text-align:left">Ticker</th><th style="padding:6px;text-align:left">Block</th><th style="padding:6px;text-align:right">Shares</th><th style="padding:6px;text-align:right">Price</th><th style="padding:6px;text-align:right">Value</th><th style="padding:6px;text-align:right">Weight</th><th style="padding:6px;text-align:right">SMA50</th></tr>'
+    rows = []
+    for t in shares_map:
+        if shares_map[t] == 0 and t not in sma50_exit_status:
+            continue
+        block = None
+        for b in UNIVERSES:
+            if t in last_rebal[b]["picks"]:
+                block = b
+                break
+        blabel = BLOCK_LABELS.get(block, block or "")
+        price = float(price_data[t][-1])
+        sh = shares_map[t]
+        sh_fmt = f"{sh:.6f}" if t == "BTC-USD" else f"{int(sh)}"
+        pfmt = f"${price:,.0f}" if t == "BTC-USD" else f"${price:.2f}"
+        val = sh * price
+        w = real_weight.get(t, 0)
+        is_exited = t in sma50_exit_status and sma50_exit_status[t]["exited"]
+        s50 = ""
+        if t in sma50_exit_status:
+            s = sma50_exit_status[t]
+            s50 = f'<span style="color:#ef4444">EXIT</span>' if is_exited else f'<span style="color:#10b981">OK</span>'
+            if s["pct_from_sma"] is not None:
+                s50 += f' ({s["pct_from_sma"]:+.1f}%)'
+        row_style = "color:#64748b;font-style:italic" if is_exited else ""
+        rows.append((w, f'<tr style="{row_style}"><td style="padding:5px 6px;font-weight:bold">{t}</td><td style="padding:5px 6px">{blabel}</td><td style="padding:5px 6px;text-align:right">{sh_fmt}</td><td style="padding:5px 6px;text-align:right">{pfmt}</td><td style="padding:5px 6px;text-align:right">${val:,.0f}</td><td style="padding:5px 6px;text-align:right">{w:.1f}%</td><td style="padding:5px 6px;text-align:right">{s50}</td></tr>'))
+    # Add SHY row
+    rows.append((shy_real_weight, f'<tr style="border-top:1px solid #334155"><td style="padding:5px 6px;font-weight:bold;color:#94a3b8">SHY</td><td style="padding:5px 6px;color:#94a3b8">Cash</td><td style="padding:5px 6px;text-align:right">{shy_shares_total}</td><td style="padding:5px 6px;text-align:right">${shy_price_now:.2f}</td><td style="padding:5px 6px;text-align:right">${total_shy_dollars:,.0f}</td><td style="padding:5px 6px;text-align:right">{shy_real_weight:.1f}%</td><td style="padding:5px 6px;text-align:right">—</td></tr>'))
+    rows.sort(key=lambda x: -x[0])
+    tbl += "".join(r[1] for r in rows)
+    tbl += '</table>'
+    return tbl
+
 def build_daily_email_html():
-    """Full daily email with SMA50 signals, trade orders, benchmarks + optional rebalancing info."""
+    """Full daily email: performance, signals, orders, portfolio, benchmarks."""
     new_rebal = is_new_rebalancing()
     # Benchmark summary
-    bench_html = f'''<div style="background:#0f172a;padding:12px;border-radius:6px;margin:16px 0">
+    bench_html = f'''<div style="background:#0f172a;padding:12px;border-radius:6px;margin:8px 0">
         <table style="width:100%;font-size:12px;color:#e2e8f0;border-collapse:collapse">
-        <tr style="color:#64748b;font-size:10px"><th style="padding:4px;text-align:left"></th><th style="padding:4px;text-align:right;color:#06b6d4">Centinela</th><th style="padding:4px;text-align:right;color:#3b82f6">SPY</th><th style="padding:4px;text-align:right;color:#f59e0b">60/40</th></tr>
+        <tr style="color:#64748b;font-size:9px;text-transform:uppercase"><th style="padding:4px;text-align:left"></th><th style="padding:4px;text-align:right;color:#06b6d4">Centinela</th><th style="padding:4px;text-align:right;color:#3b82f6">SPY</th><th style="padding:4px;text-align:right;color:#f59e0b">60/40</th></tr>
         <tr><td style="padding:4px;color:#94a3b8">YTD</td><td style="padding:4px;text-align:right;font-weight:bold;color:#06b6d4">{metrics_dragon["ytd"]:+.2f}%</td><td style="padding:4px;text-align:right">{metrics_spy["ytd"]:+.2f}%</td><td style="padding:4px;text-align:right">{metrics_6040["ytd"]:+.2f}%</td></tr>
         <tr><td style="padding:4px;color:#94a3b8">Sharpe</td><td style="padding:4px;text-align:right;font-weight:bold;color:#06b6d4">{metrics_dragon["sharpe"]:.2f}</td><td style="padding:4px;text-align:right">{metrics_spy["sharpe"]:.2f}</td><td style="padding:4px;text-align:right">{metrics_6040["sharpe"]:.2f}</td></tr>
         <tr><td style="padding:4px;color:#94a3b8">Max DD</td><td style="padding:4px;text-align:right;color:#ef4444">{metrics_dragon["mdd"]:.2f}%</td><td style="padding:4px;text-align:right">{metrics_spy["mdd"]:.2f}%</td><td style="padding:4px;text-align:right">{metrics_6040["mdd"]:.2f}%</td></tr>
         </table></div>'''
 
-    return f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
-        <h2 style="color:#06b6d4;margin-bottom:4px">Centinela v3 — Doble SMA</h2>
-        <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} | 15:00 ET</p>
+    return f"""<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
+        <h2 style="color:#06b6d4;margin-bottom:4px">Centinela v3 — Dual SMA</h2>
+        <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} | Post-close</p>
+
         <div style="background:#0f172a;padding:16px;border-radius:6px;margin-bottom:16px">
-            <table style="width:100%;font-size:14px;color:#e2e8f0">
-            <tr><td>NAV</td><td style="text-align:right;font-weight:bold;color:#06b6d4">${nav_live[-1]:,.2f}</td></tr>
-            <tr><td>Hoy</td><td style="text-align:right;color:{'#10b981' if today_ret>=0 else '#ef4444'}">{today_ret:+.2f}%</td></tr>
-            <tr><td>YTD</td><td style="text-align:right;color:{'#10b981' if ytd_ret>=0 else '#ef4444'}">{ytd_ret:+.1f}%</td></tr>
-            <tr><td>Drawdown</td><td style="text-align:right;color:#ef4444">{max_dd:.1f}% (actual: {curr_dd:.1f}%)</td></tr></table>
+            <table style="width:100%;font-size:14px;color:#e2e8f0;border-collapse:collapse">
+            <tr><td style="padding:4px 0">NAV</td><td style="padding:4px 0;text-align:right;font-weight:bold;color:#06b6d4">${nav_live[-1]:,.2f}</td></tr>
+            <tr><td style="padding:4px 0">Today</td><td style="padding:4px 0;text-align:right;color:{'#10b981' if today_ret>=0 else '#ef4444'}">{today_ret:+.2f}% <span style="font-size:12px;color:#94a3b8">({'-' if today_dollar<0 else '+'}${abs(today_dollar):,.0f})</span></td></tr>
+            <tr><td style="padding:4px 0">MTD</td><td style="padding:4px 0;text-align:right;color:{'#10b981' if mtd_ret>=0 else '#ef4444'}">{mtd_ret:+.2f}% <span style="font-size:12px;color:#94a3b8">({'-' if mtd_dollar<0 else '+'}${abs(mtd_dollar):,.0f})</span></td></tr>
+            <tr><td style="padding:4px 0">YTD</td><td style="padding:4px 0;text-align:right;color:{'#10b981' if ytd_ret>=0 else '#ef4444'}">{ytd_ret:+.2f}% <span style="font-size:12px;color:#94a3b8">({'-' if ytd_dollar<0 else '+'}${abs(ytd_dollar):,.0f})</span></td></tr>
+            <tr><td style="padding:4px 0">Drawdown</td><td style="padding:4px 0;text-align:right;color:#ef4444">{curr_dd:.1f}% <span style="font-size:12px;color:#94a3b8">(max: {max_dd:.1f}%)</span></td></tr>
+            </table>
         </div>
-        <h3 style="color:#94a3b8;font-size:12px;text-transform:uppercase;margin-bottom:8px">Senales SMA50 — Equity & Hard Assets</h3>
+
+        <h3 style="color:#94a3b8;font-size:12px;text-transform:uppercase;margin-bottom:8px">SMA50 Signals — Equity & Hard Assets</h3>
         {build_sma50_email_section()}
         {build_trade_blotter_email()}
+
         {build_rebal_section() if new_rebal else ''}
+
+        {build_portfolio_email_section()}
+
         <h3 style="color:#94a3b8;font-size:12px;text-transform:uppercase;margin:16px 0 8px">vs Benchmarks YTD</h3>
         {bench_html}
-        <p style="margin-top:20px;font-size:10px;color:#475569">SFinance-alicIA | Centinela v3 Doble SMA | {TODAY.strftime("%Y-%m-%d")} |
-        <a href="https://dragon-portfolio-liard.vercel.app/DragonDobleSMA_Live.html" style="color:#06b6d4">Ver Dashboard</a></p>
+
+        <p style="margin-top:20px;font-size:10px;color:#475569">SFinance-alicIA | Centinela v3 Dual SMA | {TODAY.strftime("%Y-%m-%d")} |
+        <a href="https://dragon-portfolio-liard.vercel.app/DragonDobleSMA_Live.html" style="color:#06b6d4">View Dashboard</a></p>
     </div>"""
 
 def send_daily_email():
@@ -1718,12 +1764,12 @@ def send_daily_email():
         return False
     # Build subject based on signals
     if sma50_new_exits:
-        subject = f"ACCION — VENDER {', '.join(sma50_new_exits)} → SHY | Centinela v3 | {TODAY}"
+        subject = f"ACTION — SELL {', '.join(sma50_new_exits)} → SHY | Centinela v3 | {TODAY}"
     elif sma50_new_entries:
-        subject = f"ACCION — COMPRAR {', '.join(sma50_new_entries)} ← SHY | Centinela v3 | {TODAY}"
+        subject = f"ACTION — BUY {', '.join(sma50_new_entries)} ← SHY | Centinela v3 | {TODAY}"
     elif is_new_rebalancing():
-        month_names = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
-        subject = f"Centinela v3 — Rebalanceo {month_names[last_rebal['date'].month-1]} | NAV ${nav_live[-1]:,.0f} | {TODAY}"
+        month_names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        subject = f"Centinela v3 — Rebalance {month_names[last_rebal['date'].month-1]} | NAV ${nav_live[-1]:,.0f} | {TODAY}"
     else:
         subject = f"Centinela v3 — NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}% | {TODAY}"
     msg = MIMEMultipart("alternative")

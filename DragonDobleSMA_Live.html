@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,8 +109,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
 <div class="container">
 
   <div class="tabs">
-    <span class="tab active" onclick="switchTab(0)">Panel Live</span>
-    <span class="tab" onclick="switchTab(1)">Filosofia & Backtest</span>
+    <span class="tab active" onclick="switchTab(0)">Live Panel</span>
+    <span class="tab" onclick="switchTab(1)">Philosophy & Backtest</span>
   </div>
 
   <div id="tab-live" class="tab-panel active">
@@ -118,58 +118,58 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
   <div class="header">
     <div class="header-left">
       <h1><span>Centinela</span> v3 <span class="live-badge">LIVE</span></h1>
-      <div class="subtitle">Doble SMA (SMA200 + Exit SMA50) | Top-3 Momentum 126d | Rebalanceo Mensual | $10,000 inicial</div>
+      <div class="subtitle">Dual SMA (SMA200 + Exit SMA50) | Top-3 Momentum 126d | Monthly Rebalance | $10,000 initial</div>
     </div>
     <div class="header-right">
       <strong>SFinance-alicIA</strong><br>
-      Senal: 2026-03-05<br>
-      Proximo: 2026-03-31 (25d)
+      Signal: 2026-03-05<br>
+      Next: 2026-03-31 (25d)
     </div>
   </div>
 
   <div class="alert-banner alert-exit" style="margin-bottom:16px">
         <div class="alert-title" style="display:flex;align-items:center;gap:8px">
-            <span style="background:#ef4444;color:#0f172a;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">ACCION REQUERIDA</span>
-            <span>Senal SMA50 detectada. Ejecutar ordenes MOC antes del cierre (16:00 ET).</span>
+            <span style="background:#ef4444;color:#0f172a;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">ACTION REQUIRED</span>
+            <span>SMA50 signal detected. Execute MOC orders before close (16:00 ET).</span>
         </div>
         <div style="margin-top:8px;font-size:10px;color:#64748b;line-height:1.6">
-        <strong style="color:#94a3b8">Protocolo:</strong>
-        16:00 ET → Revisar dashboard (auto-update) |
-        Senal SMA50 → Ejecutar MOC mismo dia |
-        Rebal mensual → Rotar el 1er dia del mes MOC |
-        Email → Recibes alerta pre-cierre si hay senal
+        <strong style="color:#94a3b8">Protocol:</strong>
+        16:00 ET → Review dashboard (auto-update) |
+        SMA50 signal → Execute MOC same day |
+        Monthly rebal → Rotate on 1st of month MOC |
+        Email → Pre-close alert if signal detected
     </div>
     </div>
 
-  <div class="alert-banner alert-exit"><div class="alert-title">SENAL DE SALIDA HOY — Ejecutar MOC</div><div class="alert-action">VENDER EEM (Emergentes) → SHY | Precio: $57.63 | SMA50: $58.82 (-2.0%)</div></div><div class="alert-banner alert-watch"><div class="alert-title">VIGILANCIA SMA50 — Activos cerca del umbral (&lt;2%)</div><div class="alert-action">EWZ (Brasil) — +1.6% de SMA50</div></div><div class="alert-banner alert-info"><div class="alert-title">POSICIONES EN SHY (salidas por SMA50)</div><div class="alert-action">EEM (Emergentes) — -2.0% bajo SMA50</div><div class="alert-action">SLV (Plata) — -3.5% bajo SMA50</div><div class="alert-action">CPER (Cobre) — -1.3% bajo SMA50</div></div>
+  <div class="alert-banner alert-exit"><div class="alert-title">EXIT SIGNAL TODAY — Execute MOC</div><div class="alert-action">SELL EEM (Emerging Mkts) → SHY | Price: $57.63 | SMA50: $58.82 (-2.0%)</div></div><div class="alert-banner alert-watch"><div class="alert-title">SMA50 WATCH — Assets near threshold (&lt;2%)</div><div class="alert-action">EWZ (Brazil) — +1.6% from SMA50</div></div><div class="alert-banner alert-info"><div class="alert-title">POSITIONS IN SHY (SMA50 exits)</div><div class="alert-action">SLV (Silver) — -3.5% below SMA50</div><div class="alert-action">CPER (Copper) — -1.3% below SMA50</div><div class="alert-action">EEM (Emerging Mkts) — -2.0% below SMA50</div></div>
 
-  <div style="margin-bottom:20px"><div class="section-title">Ordenes de Ejecucion — MOC (Market on Close)</div><table class="data-table"><tr><th>Accion</th><th>Ticker</th><th>Nombre</th><th class="num">Acciones</th><th class="num">Precio Aprox</th><th class="num">Monto Est.</th><th>Motivo</th></tr><tr style="background:rgba(239,68,68,0.08)">
-            <td style="color:#ef4444;font-weight:700">VENDER</td>
+  <div style="margin-bottom:20px"><div class="section-title">Trade Orders — MOC (Market on Close)</div><table class="data-table"><tr><th>Action</th><th>Ticker</th><th>Name</th><th class="num">Shares</th><th class="num">Est. Price</th><th class="num">Est. Amount</th><th>Reason</th></tr><tr style="background:rgba(239,68,68,0.08)">
+            <td style="color:#ef4444;font-weight:700">SELL</td>
             <td style="color:#f59e0b;font-weight:700">EEM</td>
-            <td>Emergentes</td>
+            <td>Emerging Mkts</td>
             <td class="num">14</td>
             <td class="num">$57.63</td>
             <td class="num">$807</td>
             <td style="font-size:10px;color:#94a3b8">SMA50 Exit → SHY</td>
         </tr><tr style="background:rgba(16,185,129,0.08)">
-            <td style="color:#10b981;font-weight:700">COMPRAR</td>
+            <td style="color:#10b981;font-weight:700">BUY</td>
             <td style="color:#94a3b8;font-weight:700">SHY</td>
             <td>Cash 1-3Y</td>
             <td class="num">9</td>
             <td class="num">$82.69</td>
             <td class="num">$744</td>
-            <td style="font-size:10px;color:#94a3b8">Destino de EEM</td>
+            <td style="font-size:10px;color:#94a3b8">From EEM exit</td>
         </tr></table></div>
 
   <div class="nav-card">
     <div class="nav-main">
-      <div class="nav-label">Valor del Portafolio</div>
+      <div class="nav-label">Portfolio Value</div>
       <div class="nav-value">$11,169.21</div>
-      <div class="nav-change neg">-0.49% hoy ($55)</div>
+      <div class="nav-change neg">-0.49% today ($55)</div>
     </div>
     <div class="nav-kpis">
       <div class="nav-kpi">
-        <div class="nav-kpi-label">Hoy</div>
+        <div class="nav-kpi-label">Today</div>
         <div class="nav-kpi-value neg">-0.49%</div>
         <div class="nav-kpi-sub">-$55</div>
       </div>
@@ -184,41 +184,41 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         <div class="nav-kpi-sub">+$1,169</div>
       </div>
       <div class="nav-kpi">
-        <div class="nav-kpi-label">Desde Inicio</div>
+        <div class="nav-kpi-label">Since Inception</div>
         <div class="nav-kpi-value pos">+11.69%</div>
         <div class="nav-kpi-sub">+$1,169</div>
       </div>
       <div class="nav-kpi">
         <div class="nav-kpi-label">Drawdown</div>
         <div class="nav-kpi-value neg">-5.1%</div>
-        <div class="nav-kpi-sub">actual: -1.6%</div>
+        <div class="nav-kpi-sub">current: -1.6%</div>
       </div>
     </div>
   </div>
 
-  <div class="section-title">Evolucion del Portafolio — Desde Inicio</div>
+  <div class="section-title">Portfolio Evolution — Since Inception</div>
   <div class="chart-container"><svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#06b6d4" stop-opacity="0.4"/><stop offset="100%" stop-color="#06b6d4" stop-opacity="0.02"/></linearGradient></defs><line x1="60" y1="285" x2="880" y2="285" stroke="#334155" stroke-width="0.5"/><text x="52" y="285" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$10,000</text><line x1="60" y1="247" x2="880" y2="247" stroke="#334155" stroke-width="0.5"/><text x="52" y="247" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$10,200</text><line x1="60" y1="210" x2="880" y2="210" stroke="#334155" stroke-width="0.5"/><text x="52" y="210" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$10,400</text><line x1="60" y1="172" x2="880" y2="172" stroke="#334155" stroke-width="0.5"/><text x="52" y="172" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$10,600</text><line x1="60" y1="134" x2="880" y2="134" stroke="#334155" stroke-width="0.5"/><text x="52" y="134" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$10,800</text><line x1="60" y1="97" x2="880" y2="97" stroke="#334155" stroke-width="0.5"/><text x="52" y="97" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$11,000</text><line x1="60" y1="59" x2="880" y2="59" stroke="#334155" stroke-width="0.5"/><text x="52" y="59" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$11,200</text><line x1="60" y1="22" x2="880" y2="22" stroke="#334155" stroke-width="0.5"/><text x="52" y="22" text-anchor="end" fill="#94a3b8" font-size="10" dominant-baseline="middle">$11,400</text><text x="98" y="332" text-anchor="middle" fill="#64748b" font-size="9">2026-01-05</text><line x1="98" y1="15" x2="98" y2="300" stroke="#1e293b" stroke-width="0.5"/><text x="289" y="332" text-anchor="middle" fill="#64748b" font-size="9">2026-01-20</text><line x1="289" y1="15" x2="289" y2="300" stroke="#1e293b" stroke-width="0.5"/><text x="460" y="332" text-anchor="middle" fill="#64748b" font-size="9">2026-02-02</text><line x1="460" y1="15" x2="460" y2="300" stroke="#1e293b" stroke-width="0.5"/><text x="651" y="332" text-anchor="middle" fill="#64748b" font-size="9">2026-02-17</text><line x1="651" y1="15" x2="651" y2="300" stroke="#1e293b" stroke-width="0.5"/><text x="823" y="332" text-anchor="middle" fill="#64748b" font-size="9">2026-03-02</text><line x1="823" y1="15" x2="823" y2="300" stroke="#1e293b" stroke-width="0.5"/><polygon points="60,300 60.0,284.7 79.1,276.8 98.1,254.9 117.2,246.1 136.3,257.9 155.3,251.3 174.4,243.3 193.5,221.4 212.6,222.9 231.6,198.7 250.7,208.4 269.8,218.1 288.8,202.0 307.9,191.2 327.0,181.5 346.0,149.6 365.1,132.4 384.2,111.8 403.3,92.9 422.3,78.9 441.4,161.6 460.5,186.0 479.5,149.0 498.6,149.7 517.7,161.8 536.7,144.7 555.8,124.5 574.9,132.5 594.0,111.0 613.0,123.3 632.1,119.0 651.2,130.6 670.2,115.2 689.3,108.6 708.4,77.8 727.4,65.9 746.5,65.0 765.6,58.3 784.7,51.5 803.7,30.3 822.8,36.9 841.9,61.1 860.9,54.8 880.0,65.2 880,300" fill="url(#grad)" opacity="0.3"/><polyline points="60.0,284.7 79.1,276.8 98.1,254.9 117.2,246.1 136.3,257.9 155.3,251.3 174.4,243.3 193.5,221.4 212.6,222.9 231.6,198.7 250.7,208.4 269.8,218.1 288.8,202.0 307.9,191.2 327.0,181.5 346.0,149.6 365.1,132.4 384.2,111.8 403.3,92.9 422.3,78.9 441.4,161.6 460.5,186.0 479.5,149.0 498.6,149.7 517.7,161.8 536.7,144.7 555.8,124.5 574.9,132.5 594.0,111.0 613.0,123.3 632.1,119.0 651.2,130.6 670.2,115.2 689.3,108.6 708.4,77.8 727.4,65.9 746.5,65.0 765.6,58.3 784.7,51.5 803.7,30.3 822.8,36.9 841.9,61.1 860.9,54.8 880.0,65.2" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linejoin="round"/></svg></div>
 
   <div class="exp-strip">
     <div class="exp-item"><div class="exp-label">Equity Exp</div><div class="exp-value">100%</div><div class="exp-sub">SMA200 filter</div></div>
     <div class="exp-item"><div class="exp-label">Bonds Exp</div><div class="exp-value">100%</div><div class="exp-sub">SMA200 filter</div></div>
     <div class="exp-item"><div class="exp-label">Hard Assets Exp</div><div class="exp-value">100%</div><div class="exp-sub">SMA200 filter</div></div>
-    <div class="exp-item"><div class="exp-label">Long Vol</div><div class="exp-value" style="font-size:14px;color:#ef4444">BTAL</div><div class="exp-sub">fijo 21%</div></div>
+    <div class="exp-item"><div class="exp-label">Long Vol</div><div class="exp-value" style="font-size:14px;color:#ef4444">BTAL</div><div class="exp-sub">fixed 21%</div></div>
     <div class="exp-item"><div class="exp-label">Cmdty Trend</div><div class="exp-value">100%</div><div class="exp-sub">DBC SMA200 gate</div></div>
-    <div class="exp-item"><div class="exp-label">SMA50 Salidas</div><div class="exp-value" style="color:#ef4444">3</div><div class="exp-sub">en SHY</div></div>
-    <div class="exp-item"><div class="exp-label">Posiciones</div><div class="exp-value" style="color:#f1f5f9">11</div><div class="exp-sub">tickers activos</div></div>
-    <div class="exp-item"><div class="exp-label">Cash (SHY)</div><div class="exp-value" style="color:#f1f5f9">15%</div><div class="exp-sub">capital protegido</div></div>
-    <div class="exp-item"><div class="exp-label">Proximo Rebal</div><div class="exp-value" style="color:#f1f5f9">25d</div><div class="exp-sub">2026-03-31</div></div>
+    <div class="exp-item"><div class="exp-label">SMA50 Exits</div><div class="exp-value" style="color:#ef4444">3</div><div class="exp-sub">in SHY</div></div>
+    <div class="exp-item"><div class="exp-label">Positions</div><div class="exp-value" style="color:#f1f5f9">11</div><div class="exp-sub">active tickers</div></div>
+    <div class="exp-item"><div class="exp-label">Cash (SHY)</div><div class="exp-value" style="color:#f1f5f9">15%</div><div class="exp-sub">protected capital</div></div>
+    <div class="exp-item"><div class="exp-label">Next Rebal</div><div class="exp-value" style="color:#f1f5f9">25d</div><div class="exp-sub">2026-03-31</div></div>
   </div>
 
-  <div class="section-title">Senales por Bloque — Ultima Senal</div>
-  <div class="signal-grid"><div class="signal-card" style="border-left:3px solid #10b981"><div class="signal-header"><span style="color:#10b981;font-weight:700">Equity</span> <span class="signal-wpct">(24%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#10b981">EWY</span> <span class="signal-name">Korea</span> <span class="signal-mom">104.9%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#10b981">EWZ</span> <span class="signal-name">Brasil</span> <span class="signal-mom">35.6%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#10b981">EEM</span> <span class="signal-name">Emergentes</span> <span class="signal-mom">24.5%</span></div><div class="signal-exp">Exposicion 100%</div></div><div class="signal-card" style="border-left:3px solid #06b6d4"><div class="signal-header"><span style="color:#06b6d4;font-weight:700">Bonds</span> <span class="signal-wpct">(18%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#06b6d4">TLT</span> <span class="signal-name">20+Y</span> <span class="signal-mom">5.0%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#06b6d4">LQD</span> <span class="signal-name">IG Corp</span> <span class="signal-mom">2.9%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#06b6d4">IEF</span> <span class="signal-name">7-10Y</span> <span class="signal-mom">2.8%</span></div><div class="signal-exp">Exposicion 100%</div></div><div class="signal-card" style="border-left:3px solid #f59e0b"><div class="signal-header"><span style="color:#f59e0b;font-weight:700">Hard Assets</span> <span class="signal-wpct">(19%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#f59e0b">SLV</span> <span class="signal-name">Plata</span> <span class="signal-mom">129.6%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#f59e0b">GLD</span> <span class="signal-name">Oro</span> <span class="signal-mom">55.5%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#f59e0b">CPER</span> <span class="signal-name">Cobre</span> <span class="signal-mom">30.3%</span></div><div class="signal-exp">Exposicion 100%</div></div><div class="signal-card" style="border-left:3px solid #ef4444"><div class="signal-header"><span style="color:#ef4444;font-weight:700">Long Vol</span> <span class="signal-wpct">(21%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#ef4444">BTAL</span> <span class="signal-name">Anti-Beta</span> <span class="signal-mom">-10.2%</span></div></div><div class="signal-card" style="border-left:3px solid #a855f7"><div class="signal-header"><span style="color:#a855f7;font-weight:700">Commodities</span> <span class="signal-wpct">(18%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#a855f7">DBC</span> <span class="signal-name">Commodities</span> <span class="signal-mom">20.3%</span></div><div class="signal-exp">Exposicion 100%</div></div></div>
+  <div class="section-title">Signals by Block — Latest Signal</div>
+  <div class="signal-grid"><div class="signal-card" style="border-left:3px solid #10b981"><div class="signal-header"><span style="color:#10b981;font-weight:700">Equity</span> <span class="signal-wpct">(24%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#10b981">EWY</span> <span class="signal-name">Korea</span> <span class="signal-mom">104.9%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#10b981">EWZ</span> <span class="signal-name">Brazil</span> <span class="signal-mom">35.6%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#10b981">EEM</span> <span class="signal-name">Emerging Mkts</span> <span class="signal-mom">24.5%</span></div><div class="signal-exp">Exposure 100%</div></div><div class="signal-card" style="border-left:3px solid #06b6d4"><div class="signal-header"><span style="color:#06b6d4;font-weight:700">Bonds</span> <span class="signal-wpct">(18%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#06b6d4">TLT</span> <span class="signal-name">20+Y</span> <span class="signal-mom">5.0%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#06b6d4">LQD</span> <span class="signal-name">IG Corp</span> <span class="signal-mom">2.9%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#06b6d4">IEF</span> <span class="signal-name">7-10Y</span> <span class="signal-mom">2.8%</span></div><div class="signal-exp">Exposure 100%</div></div><div class="signal-card" style="border-left:3px solid #f59e0b"><div class="signal-header"><span style="color:#f59e0b;font-weight:700">Hard Assets</span> <span class="signal-wpct">(19%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#f59e0b">SLV</span> <span class="signal-name">Silver</span> <span class="signal-mom">129.6%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#f59e0b">GLD</span> <span class="signal-name">Gold</span> <span class="signal-mom">55.5%</span></div><div class="signal-row"><span class="signal-ticker" style="color:#f59e0b">CPER</span> <span class="signal-name">Copper</span> <span class="signal-mom">30.3%</span></div><div class="signal-exp">Exposure 100%</div></div><div class="signal-card" style="border-left:3px solid #ef4444"><div class="signal-header"><span style="color:#ef4444;font-weight:700">Long Vol</span> <span class="signal-wpct">(21%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#ef4444">BTAL</span> <span class="signal-name">Anti-Beta</span> <span class="signal-mom">-10.2%</span></div></div><div class="signal-card" style="border-left:3px solid #a855f7"><div class="signal-header"><span style="color:#a855f7;font-weight:700">Commodities</span> <span class="signal-wpct">(18%)</span></div><div class="signal-row"><span class="signal-ticker" style="color:#a855f7">DBC</span> <span class="signal-name">Commodities</span> <span class="signal-mom">20.3%</span></div><div class="signal-exp">Exposure 100%</div></div></div>
 
-  <div class="section-title">Posiciones Actuales — Rebal 02/03/2026</div>
+  <div class="section-title">Current Positions — Rebal 02/03/2026</div>
   <div class="pos-donut-grid">
     <div style="overflow-x:auto">
       <table class="data-table">
-        <tr><th>Ticker</th><th>Nombre</th><th>Bloque</th><th class="num">Obj.</th><th class="num">Real</th><th class="num">Acciones</th><th class="num">Valor</th><th class="num">Precio</th><th class="num">Mom 126d</th><th class="num">SMA200</th><th class="num">SMA50 Exit</th></tr>
+        <tr><th>Ticker</th><th>Name</th><th>Block</th><th class="num">Target</th><th class="num">Actual</th><th class="num">Shares</th><th class="num">Value</th><th class="num">Price</th><th class="num">Mom 126d</th><th class="num">SMA200</th><th class="num">SMA50 Exit</th></tr>
         <tr style="">
             <td style="color:#a855f7;font-weight:700">DBC</td>
             <td>Commodities</td>
@@ -233,7 +233,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
             <td class="num" style="color:#9ca3af;font-weight:700">—</td>
         </tr><tr style="">
             <td style="color:#22c55e;font-weight:700">EWZ</td>
-            <td>Brasil</td>
+            <td>Brazil</td>
             <td>Equity</td>
             <td class="num">8.0%</td>
             <td class="num" style="color:#94a3b8;font-weight:700">7.5%</td>
@@ -305,7 +305,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
             <td class="num" style="color:#9ca3af;font-weight:700">—</td>
         </tr><tr style="">
             <td style="color:#f59e0b;font-weight:700">GLD</td>
-            <td>Oro</td>
+            <td>Gold</td>
             <td>Hard Assets</td>
             <td class="num">6.3%</td>
             <td class="num" style="color:#f59e0b;font-weight:700">4.2%</td>
@@ -318,7 +318,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </tr><tr style="background:rgba(148,163,184,0.08);border-top:2px solid #334155;">
             <td style="color:#94a3b8;font-weight:700">SHY</td>
             <td>Cash (1-3Y)</td>
-            <td>Proteccion</td>
+            <td>Protection</td>
             <td class="num">14.7%</td>
             <td class="num" style="color:#94a3b8;font-weight:700">38.5%</td>
             <td class="num">52</td>
@@ -329,7 +329,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
             <td class="num" style="color:#94a3b8">—</td>
         </tr><tr style="background:rgba(239,68,68,0.06);opacity:0.6;">
             <td style="color:#f59e0b;font-weight:700"><s>EEM</s></td>
-            <td>Emergentes → SHY</td>
+            <td>Emerging Mkts → SHY</td>
             <td>Equity</td>
             <td class="num">8.0%</td>
             <td class="num" style="color:#ef4444;font-weight:700">0.0%</td>
@@ -341,7 +341,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
             <td class="num" style="color:#ef4444;font-weight:700">SALIDA (-2.0%)</td>
         </tr><tr style="background:rgba(239,68,68,0.06);opacity:0.6;">
             <td style="color:#94a3b8;font-weight:700"><s>SLV</s></td>
-            <td>Plata → SHY</td>
+            <td>Silver → SHY</td>
             <td>Hard Assets</td>
             <td class="num">6.3%</td>
             <td class="num" style="color:#ef4444;font-weight:700">0.0%</td>
@@ -353,7 +353,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
             <td class="num" style="color:#ef4444;font-weight:700">SALIDA (-3.5%)</td>
         </tr><tr style="background:rgba(239,68,68,0.06);opacity:0.6;">
             <td style="color:#f97316;font-weight:700"><s>CPER</s></td>
-            <td>Cobre → SHY</td>
+            <td>Copper → SHY</td>
             <td>Hard Assets</td>
             <td class="num">6.3%</td>
             <td class="num" style="color:#ef4444;font-weight:700">0.0%</td>
@@ -367,17 +367,17 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
       </table>
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <div class="section-title" style="text-align:center">Distribucion por Bloque</div>
+      <div class="section-title" style="text-align:center">Block Distribution</div>
       <svg viewBox="0 0 240 265" xmlns="http://www.w3.org/2000/svg"><path d="M 120.0,20.0 A 100,100 0 0,1 210.5,77.4 L 174.3,94.5 A 60,60 0 0,0 120.0,60.0 Z" fill="#a855f7" stroke="#0f172a" stroke-width="2"/><path d="M 210.5,77.4 A 100,100 0 0,1 168.2,207.6 L 148.9,172.6 A 60,60 0 0,0 174.3,94.5 Z" fill="#10b981" stroke="#0f172a" stroke-width="2"/><path d="M 168.2,207.6 A 100,100 0 0,1 56.3,197.1 L 81.8,166.2 A 60,60 0 0,0 148.9,172.6 Z" fill="#f59e0b" stroke="#0f172a" stroke-width="2"/><path d="M 56.3,197.1 A 100,100 0 0,1 23.1,95.1 L 61.9,105.1 A 60,60 0 0,0 81.8,166.2 Z" fill="#06b6d4" stroke="#0f172a" stroke-width="2"/><path d="M 23.1,95.1 A 100,100 0 0,1 120.0,20.0 L 120.0,60.0 A 60,60 0 0,0 61.9,105.1 Z" fill="#ef4444" stroke="#0f172a" stroke-width="2"/><circle cx="10" cy="245" r="5" fill="#a855f7"/><text x="20" y="249" fill="#94a3b8" font-size="10">Cmdty Trend</text><circle cx="117" cy="245" r="5" fill="#10b981"/><text x="127" y="249" fill="#94a3b8" font-size="10">Equity</text><circle cx="189" cy="245" r="5" fill="#f59e0b"/><text x="199" y="249" fill="#94a3b8" font-size="10">Hard Assets</text><circle cx="296" cy="245" r="5" fill="#06b6d4"/><text x="306" y="249" fill="#94a3b8" font-size="10">Bonds</text><circle cx="361" cy="245" r="5" fill="#ef4444"/><text x="371" y="249" fill="#94a3b8" font-size="10">Long Vol</text></svg>
     </div>
   </div>
 
-  <div class="section-title">Estado SMA200 — Todos los Activos</div>
+  <div class="section-title">SMA200 Status — All Assets</div>
   <div class="sma-grid">
     <div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#ef4444;font-weight:700;font-size:13px">BTAL</span>
-                <span style="color:#ef4444;font-weight:600;font-size:11px">▼ BAJO</span>
+                <span style="color:#ef4444;font-weight:600;font-size:11px">▼ BELOW</span>
             </div>
             <div class="sma-card-name">Anti-Beta</div>
             <div class="sma-card-price">$14.21</div>
@@ -385,23 +385,23 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#f7931a;font-weight:700;font-size:13px">BTC-USD</span>
-                <span style="color:#ef4444;font-weight:600;font-size:11px">▼ BAJO</span>
+                <span style="color:#ef4444;font-weight:600;font-size:11px">▼ BELOW</span>
             </div>
             <div class="sma-card-name">Bitcoin</div>
-            <div class="sma-card-price">$70,841.12</div>
-            <div class="sma-card-sma">SMA: $101,175.36</div>
+            <div class="sma-card-price">$70,896.94</div>
+            <div class="sma-card-sma">SMA: $101,175.64</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#f97316;font-weight:700;font-size:13px">CPER</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Cobre</div>
+            <div class="sma-card-name">Copper</div>
             <div class="sma-card-price">$35.58</div>
             <div class="sma-card-sma">SMA: $32.05</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#a855f7;font-weight:700;font-size:13px">DBC</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">Commodities</div>
             <div class="sma-card-price">$26.52</div>
@@ -409,31 +409,31 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#f59e0b;font-weight:700;font-size:13px">EEM</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Emergentes</div>
+            <div class="sma-card-name">Emerging Mkts</div>
             <div class="sma-card-price">$57.63</div>
             <div class="sma-card-sma">SMA: $52.49</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#a855f7;font-weight:700;font-size:13px">EPOL</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Polonia</div>
+            <div class="sma-card-name">Poland</div>
             <div class="sma-card-price">$35.80</div>
             <div class="sma-card-sma">SMA: $32.82</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#ef4444;font-weight:700;font-size:13px">EWP</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Espana</div>
+            <div class="sma-card-name">Spain</div>
             <div class="sma-card-price">$53.55</div>
             <div class="sma-card-sma">SMA: $49.09</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#ec4899;font-weight:700;font-size:13px">EWY</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">Korea</div>
             <div class="sma-card-price">$125.74</div>
@@ -441,23 +441,23 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#22c55e;font-weight:700;font-size:13px">EWZ</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Brasil</div>
+            <div class="sma-card-name">Brazil</div>
             <div class="sma-card-price">$36.36</div>
             <div class="sma-card-sma">SMA: $30.38</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#f59e0b;font-weight:700;font-size:13px">GLD</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Oro</div>
+            <div class="sma-card-name">Gold</div>
             <div class="sma-card-price">$466.13</div>
             <div class="sma-card-sma">SMA: $365.77</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#38bdf8;font-weight:700;font-size:13px">IEF</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">7-10Y</div>
             <div class="sma-card-price">$96.51</div>
@@ -465,7 +465,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#f97316;font-weight:700;font-size:13px">IWM</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">Small Cap</div>
             <div class="sma-card-price">$256.76</div>
@@ -473,7 +473,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#10b981;font-weight:700;font-size:13px">LQD</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">IG Corp</div>
             <div class="sma-card-price">$110.53</div>
@@ -481,7 +481,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#8b5cf6;font-weight:700;font-size:13px">QQQ</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">Nasdaq</div>
             <div class="sma-card-price">$608.91</div>
@@ -489,7 +489,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#94a3b8;font-weight:700;font-size:13px">SHY</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">1-3Y</div>
             <div class="sma-card-price">$82.69</div>
@@ -497,15 +497,15 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#94a3b8;font-weight:700;font-size:13px">SLV</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Plata</div>
+            <div class="sma-card-name">Silver</div>
             <div class="sma-card-price">$74.27</div>
             <div class="sma-card-sma">SMA: $49.07</div>
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#3b82f6;font-weight:700;font-size:13px">SPY</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">US Large</div>
             <div class="sma-card-price">$681.31</div>
@@ -513,7 +513,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#f97316;font-weight:700;font-size:13px">TIP</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">TIPS</div>
             <div class="sma-card-price">$111.22</div>
@@ -521,7 +521,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#0ea5e9;font-weight:700;font-size:13px">TLT</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
             <div class="sma-card-name">20+Y</div>
             <div class="sma-card-price">$88.79</div>
@@ -529,18 +529,18 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
         </div><div class="sma-card">
             <div class="sma-card-header">
                 <span style="color:#06b6d4;font-weight:700;font-size:13px">VGK</span>
-                <span style="color:#10b981;font-weight:600;font-size:11px">▲ SOBRE</span>
+                <span style="color:#10b981;font-weight:600;font-size:11px">▲ ABOVE</span>
             </div>
-            <div class="sma-card-name">Europa</div>
+            <div class="sma-card-name">Europe</div>
             <div class="sma-card-price">$84.85</div>
             <div class="sma-card-sma">SMA: $80.26</div>
         </div>
   </div>
 
-  <div class="section-title">Evolutivo YTD 2026 — Todos los Activos (Base 0%)</div>
-  <div class="chart-container" style="border:1px solid #334155;border-radius:8px;padding:12px"><svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="335" x2="800" y2="335" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="335" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">-20%</text><line x1="50" y1="265" x2="800" y2="265" stroke="rgba(148,163,184,0.4)" stroke-width="1"/><text x="45" y="265" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+0%</text><line x1="50" y1="195" x2="800" y2="195" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="195" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+20%</text><line x1="50" y1="125" x2="800" y2="125" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="125" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+40%</text><line x1="50" y1="55" x2="800" y2="55" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="55" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+60%</text><text x="50" y="415" text-anchor="middle" fill="#94a3b8" font-size="9">Ene</text><text x="407" y="415" text-anchor="middle" fill="#94a3b8" font-size="9">Feb</text><text x="746" y="415" text-anchor="middle" fill="#94a3b8" font-size="9">Mar</text><polyline points="50.0,273.1 67.9,276.8 85.7,282.6 103.6,280.9 121.4,274.8 139.3,277.7 157.1,276.3 175.0,278.9 192.9,274.1 210.7,276.3 228.6,279.2 246.4,272.9 264.3,277.7 282.1,278.2 300.0,272.9 317.9,270.4 335.7,276.3 353.6,276.3 371.4,275.5 389.3,269.0 407.1,272.1 425.0,270.9 442.9,264.3 460.7,261.4 478.6,271.9 496.4,278.7 514.3,275.0 532.1,276.3 550.0,271.2 567.9,272.4 585.7,274.3 603.6,276.5 621.4,277.0 639.3,278.0 657.1,273.8 675.0,278.5 692.9,283.6 710.7,279.2 728.6,272.4 746.4,273.8 764.3,268.2 782.1,271.4 800.0,269.2" fill="none" stroke="#ef4444" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,255.1 67.9,239.3 85.7,239.9 103.6,249.6 121.4,250.7 139.3,252.8 157.1,250.1 175.0,233.5 192.9,227.1 210.7,232.6 228.6,232.7 246.4,261.6 264.3,257.3 282.1,257.0 300.0,256.8 317.9,261.8 335.7,258.4 353.6,258.1 371.4,276.6 389.3,278.4 407.1,300.1 425.0,312.4 442.9,322.8 460.7,364.1 478.6,332.7 496.4,334.4 514.3,339.7 532.1,347.0 550.0,350.0 567.9,339.5 585.7,345.0 603.6,349.2 621.4,347.1 639.3,342.9 657.1,356.5 675.0,358.6 692.9,343.1 710.7,345.1 728.6,351.4 746.4,339.8 764.3,341.8 782.1,324.1 800.0,331.6" fill="none" stroke="#f7931a" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.6 67.9,246.7 85.7,241.7 103.6,255.3 121.4,257.6 139.3,252.9 157.1,245.6 175.0,245.5 192.9,239.4 210.7,246.7 228.6,255.0 246.4,257.3 264.3,257.6 282.1,257.8 300.0,249.2 317.9,249.0 335.7,248.6 353.6,246.6 371.4,227.2 389.3,250.1 407.1,255.6 425.0,239.6 442.9,251.5 460.7,262.0 478.6,252.0 496.4,246.7 514.3,251.1 532.1,246.4 550.0,259.3 567.9,258.8 585.7,265.0 603.6,258.6 621.4,259.0 639.3,252.7 657.1,257.6 675.0,251.4 692.9,246.6 710.7,247.1 728.6,245.6 746.4,250.5 764.3,258.4 782.1,254.7 800.0,258.6" fill="none" stroke="#f97316" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.4 67.9,257.8 85.7,257.9 103.6,261.2 121.4,256.7 139.3,256.4 157.1,251.8 175.0,249.0 192.9,248.7 210.7,251.7 228.6,252.3 246.4,247.3 264.3,243.0 282.1,243.2 300.0,236.3 317.9,234.6 335.7,229.4 353.6,224.4 371.4,218.8 389.3,232.4 407.1,246.3 425.0,236.8 442.9,236.1 460.7,242.9 478.6,239.0 496.4,235.2 514.3,236.9 532.1,233.3 550.0,242.3 567.9,241.0 585.7,245.5 603.6,235.8 621.4,232.4 639.3,229.7 657.1,227.4 675.0,227.8 692.9,227.4 710.7,227.2 728.6,221.9 746.4,210.8 764.3,209.2 782.1,205.6 800.0,199.6" fill="none" stroke="#a855f7" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,255.0 67.9,251.1 85.7,248.4 103.6,251.1 121.4,251.0 139.3,249.3 157.1,244.1 175.0,246.9 192.9,245.4 210.7,243.2 228.6,244.6 246.4,248.2 264.3,242.1 282.1,239.3 300.0,236.9 317.9,236.3 335.7,228.8 353.6,226.1 371.4,228.1 389.3,236.7 407.1,235.6 425.0,233.5 442.9,238.6 460.7,240.4 478.6,230.5 496.4,227.7 514.3,227.1 532.1,221.0 550.0,225.4 567.9,223.8 585.7,225.4 603.6,223.3 621.4,224.3 639.3,216.0 657.1,220.4 675.0,214.2 692.9,209.7 710.7,213.6 728.6,214.4 746.4,221.3 764.3,241.1 782.1,237.0 800.0,246.1" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,254.3 67.9,255.1 85.7,254.2 103.6,250.8 121.4,258.5 139.3,254.8 157.1,253.0 175.0,255.9 192.9,256.5 210.7,255.3 228.6,257.6 246.4,258.4 264.3,255.3 282.1,244.2 300.0,247.9 317.9,239.4 335.7,232.5 353.6,234.4 371.4,233.1 389.3,240.9 407.1,240.2 425.0,233.4 442.9,234.1 460.7,243.1 478.6,237.6 496.4,229.3 514.3,235.7 532.1,233.0 550.0,237.7 567.9,240.1 585.7,241.8 603.6,239.5 621.4,240.3 639.3,238.7 657.1,235.8 675.0,237.3 692.9,229.8 710.7,235.0 728.6,235.6 746.4,243.7 764.3,261.4 782.1,254.7 800.0,258.7" fill="none" stroke="#a855f7" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,259.7 67.9,257.7 85.7,260.7 103.6,261.2 121.4,259.0 139.3,261.0 157.1,258.0 175.0,259.0 192.9,257.6 210.7,262.5 228.6,260.0 246.4,265.3 264.3,260.5 282.1,258.3 300.0,256.9 317.9,251.2 335.7,244.7 353.6,252.0 371.4,248.9 389.3,249.4 407.1,245.6 425.0,249.6 442.9,246.8 460.7,256.4 478.6,248.2 496.4,241.4 514.3,244.0 532.1,245.6 550.0,250.2 567.9,253.8 585.7,248.0 603.6,245.8 621.4,250.3 639.3,244.6 657.1,242.9 675.0,243.8 692.9,236.6 710.7,237.5 728.6,243.2 746.4,251.0 764.3,270.3 782.1,259.9 800.0,267.2" fill="none" stroke="#ef4444" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,246.8 67.9,237.4 85.7,227.4 103.6,229.5 121.4,231.1 139.3,222.8 157.1,222.6 175.0,227.6 192.9,220.1 210.7,215.0 228.6,210.8 246.4,215.3 264.3,198.4 282.1,197.2 300.0,190.0 317.9,192.4 335.7,173.0 353.6,162.7 371.4,166.5 389.3,174.0 407.1,179.4 425.0,167.2 442.9,181.8 460.7,182.0 478.6,165.8 496.4,160.9 514.3,166.7 532.1,144.5 550.0,143.8 567.9,132.4 585.7,144.2 603.6,136.1 621.4,127.9 639.3,103.9 657.1,113.2 675.0,94.3 692.9,78.6 710.7,73.1 728.6,69.7 746.4,83.5 764.3,138.3 782.1,130.9 800.0,162.0" fill="none" stroke="#ec4899" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,260.1 67.9,253.6 85.7,250.0 103.6,254.6 121.4,252.6 139.3,250.6 157.1,252.0 175.0,255.3 192.9,249.5 210.7,247.3 228.6,249.4 246.4,244.4 264.3,229.0 282.1,218.7 300.0,211.7 317.9,211.4 335.7,197.3 353.6,192.5 371.4,194.8 389.3,206.7 407.1,202.2 425.0,195.7 442.9,207.4 460.7,208.1 478.6,201.0 496.4,191.5 514.3,192.6 532.1,183.3 550.0,190.7 567.9,195.5 585.7,199.0 603.6,195.8 621.4,189.4 639.3,181.0 657.1,187.6 675.0,179.9 692.9,178.6 710.7,184.0 728.6,188.1 746.4,189.1 764.3,209.1 782.1,201.7 800.0,214.2" fill="none" stroke="#22c55e" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,263.1 67.9,253.8 85.7,249.9 103.6,253.4 121.4,251.4 139.3,248.8 157.1,241.9 175.0,242.4 192.9,238.6 210.7,240.9 228.6,242.7 246.4,228.6 264.3,223.0 282.1,215.8 300.0,210.3 317.9,204.4 335.7,194.3 353.6,178.0 371.4,176.8 389.3,221.8 407.1,237.6 425.0,213.6 442.9,213.8 460.7,224.5 478.6,212.5 496.4,202.3 514.3,206.4 532.1,201.8 550.0,216.1 567.9,206.2 585.7,218.9 603.6,210.0 621.4,208.9 639.3,200.9 657.1,189.7 675.0,195.6 692.9,196.7 710.7,193.1 728.6,187.5 746.4,182.0 764.3,201.3 782.1,198.1 800.0,203.1" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.1 67.9,264.1 85.7,264.3 103.6,263.7 121.4,264.7 139.3,264.3 157.1,264.7 175.0,264.3 192.9,263.6 210.7,264.3 228.6,265.7 246.4,267.0 264.3,266.1 282.1,266.2 300.0,265.6 317.9,265.1 335.7,265.5 353.6,265.8 371.4,265.4 389.3,265.6 407.1,267.4 425.0,267.1 442.9,267.2 460.7,265.1 478.6,265.1 496.4,265.1 514.3,263.5 532.1,264.5 550.0,262.4 567.9,261.0 585.7,261.0 603.6,261.8 621.4,261.4 639.3,261.4 657.1,260.2 675.0,260.2 692.9,260.5 710.7,259.6 728.6,258.2 746.4,260.3 764.3,260.7 782.1,261.4 800.0,262.5" fill="none" stroke="#38bdf8" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,261.1 67.9,255.5 85.7,250.7 103.6,251.6 121.4,247.6 139.3,244.8 157.1,243.0 175.0,243.2 192.9,240.6 210.7,237.3 228.6,236.9 246.4,241.5 264.3,234.0 282.1,231.2 300.0,238.3 317.9,239.5 335.7,238.4 353.6,240.4 371.4,240.3 389.3,245.6 407.1,242.0 425.0,241.2 442.9,244.4 460.7,251.1 478.6,238.0 496.4,235.3 514.3,236.4 532.1,238.1 550.0,245.8 567.9,240.9 585.7,240.8 603.6,239.4 621.4,238.6 639.3,238.6 657.1,244.4 675.0,240.4 692.9,238.6 710.7,236.6 728.6,243.1 746.4,239.7 764.3,246.2 782.1,242.6 800.0,249.7" fill="none" stroke="#f97316" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.9 67.9,263.9 85.7,263.9 103.6,263.7 121.4,264.7 139.3,263.4 157.1,263.8 175.0,263.0 192.9,262.2 210.7,262.6 228.6,263.6 246.4,265.7 264.3,263.6 282.1,263.0 300.0,262.8 317.9,262.5 335.7,262.9 353.6,263.4 371.4,263.3 389.3,263.6 407.1,265.2 425.0,265.1 442.9,265.5 460.7,263.8 478.6,263.6 496.4,263.6 514.3,262.8 532.1,263.2 550.0,261.5 567.9,260.4 585.7,260.0 603.6,260.4 621.4,260.1 639.3,260.4 657.1,260.0 675.0,260.1 692.9,260.2 710.7,260.0 728.6,260.1 746.4,261.3 764.3,261.4 782.1,261.1 800.0,262.5" fill="none" stroke="#10b981" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.5 67.9,262.7 85.7,259.6 103.6,259.3 121.4,261.3 139.3,257.8 157.1,257.5 175.0,258.0 192.9,261.8 210.7,260.6 228.6,260.9 246.4,268.4 264.3,263.7 282.1,261.1 300.0,260.0 317.9,258.5 335.7,255.2 353.6,254.0 371.4,256.2 389.3,260.5 407.1,258.1 425.0,263.6 442.9,269.7 460.7,274.7 478.6,267.5 496.4,264.8 514.3,266.4 532.1,265.5 550.0,272.6 567.9,271.9 585.7,272.2 603.6,269.7 621.4,271.0 639.3,268.0 657.1,272.2 675.0,268.5 692.9,263.5 710.7,267.7 728.6,268.8 746.4,268.4 764.3,272.1 782.1,266.9 800.0,267.9" fill="none" stroke="#8b5cf6" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.7 67.9,264.5 85.7,264.5 103.6,264.5 121.4,264.7 139.3,264.8 157.1,264.8 175.0,264.7 192.9,264.6 210.7,264.9 228.6,264.9 246.4,264.9 264.3,264.7 282.1,264.9 300.0,264.7 317.9,264.6 335.7,264.5 353.6,264.5 371.4,264.4 389.3,264.1 407.1,265.3 425.0,265.4 442.9,265.2 460.7,264.7 478.6,264.7 496.4,264.6 514.3,264.4 532.1,264.7 550.0,264.4 567.9,263.8 585.7,263.9 603.6,264.1 621.4,264.1 639.3,264.1 657.1,263.8 675.0,263.8 692.9,263.9 710.7,263.8 728.6,263.3 746.4,263.9 764.3,264.0 782.1,264.2 800.0,264.4" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,257.6 67.9,239.5 85.7,214.3 103.6,229.3 121.4,236.1 139.3,221.5 157.1,195.2 175.0,187.7 192.9,155.3 210.7,162.0 228.6,174.5 246.4,150.8 264.3,158.6 282.1,141.3 300.0,109.9 317.9,80.3 335.7,62.7 353.6,40.9 371.4,41.0 389.3,204.9 407.1,221.2 425.0,196.6 442.9,184.5 460.7,252.5 478.6,233.4 496.4,201.6 514.3,215.9 532.1,198.8 550.0,246.8 567.9,236.0 585.7,254.2 603.6,234.0 621.4,229.0 639.3,198.5 657.1,177.0 675.0,185.1 692.9,179.9 710.7,177.6 728.6,153.0 746.4,171.6 764.3,209.0 782.1,205.4 800.0,211.3" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.2 67.9,261.8 85.7,259.7 103.6,260.9 121.4,260.9 139.3,258.6 157.1,258.0 175.0,258.7 192.9,260.5 210.7,259.5 228.6,259.8 246.4,267.1 264.3,263.0 282.1,261.2 300.0,261.1 317.9,259.3 335.7,257.8 353.6,257.9 371.4,258.6 389.3,259.7 407.1,257.9 425.0,260.9 442.9,262.6 460.7,267.0 478.6,260.4 496.4,258.6 514.3,259.6 532.1,259.7 550.0,265.2 567.9,264.9 585.7,264.3 603.6,262.6 621.4,263.5 639.3,261.0 657.1,264.6 675.0,262.0 692.9,259.1 710.7,261.0 728.6,262.7 746.4,262.5 764.3,265.6 782.1,263.2 800.0,265.1" fill="none" stroke="#3b82f6" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.0 67.9,264.0 85.7,264.3 103.6,263.7 121.4,264.4 139.3,264.0 157.1,264.0 175.0,263.6 192.9,263.3 210.7,263.8 228.6,264.5 246.4,265.5 264.3,264.2 282.1,264.5 300.0,263.8 317.9,263.3 335.7,263.3 353.6,263.1 371.4,262.9 389.3,263.0 407.1,263.9 425.0,263.4 442.9,263.7 460.7,262.7 478.6,262.4 496.4,262.1 514.3,261.4 532.1,262.0 550.0,260.6 567.9,260.1 585.7,260.6 603.6,260.8 621.4,260.6 639.3,260.7 657.1,260.4 675.0,260.4 692.9,260.0 710.7,259.1 728.6,258.5 746.4,259.5 764.3,259.8 782.1,260.6 800.0,260.6" fill="none" stroke="#f97316" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.3 67.9,263.6 85.7,264.3 103.6,262.3 121.4,264.1 139.3,261.7 157.1,262.8 175.0,262.2 192.9,260.1 210.7,260.2 228.6,262.2 246.4,266.9 264.3,264.2 282.1,262.7 300.0,261.7 317.9,260.0 335.7,262.2 353.6,263.1 371.4,263.0 389.3,264.9 407.1,267.3 425.0,266.4 442.9,267.3 460.7,263.5 478.6,263.3 496.4,263.4 514.3,259.3 532.1,261.2 550.0,256.5 567.9,254.5 585.7,253.9 603.6,255.3 621.4,254.9 639.3,255.8 657.1,254.5 675.0,253.8 692.9,253.8 710.7,252.3 728.6,250.1 746.4,253.8 764.3,254.5 782.1,255.6 800.0,257.1" fill="none" stroke="#0ea5e9" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,260.8 67.9,258.0 85.7,257.2 103.6,258.2 121.4,258.2 139.3,255.8 157.1,253.8 175.0,255.7 192.9,254.3 210.7,255.2 228.6,254.1 246.4,259.2 264.3,255.6 282.1,253.5 300.0,250.9 317.9,248.5 335.7,242.6 353.6,247.1 371.4,245.1 389.3,248.5 407.1,245.6 425.0,247.0 442.9,246.5 460.7,251.6 478.6,244.4 496.4,240.3 514.3,241.3 532.1,240.4 550.0,243.3 567.9,243.5 585.7,241.3 603.6,240.0 621.4,241.6 639.3,238.0 657.1,240.2 675.0,239.2 692.9,236.0 710.7,236.2 728.6,237.3 746.4,245.3 764.3,256.4 782.1,252.3 800.0,259.6" fill="none" stroke="#06b6d4" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,263.3 67.9,259.3 85.7,257.6 103.6,259.8 121.4,258.6 139.3,257.1 157.1,253.0 175.0,253.3 192.9,248.8 210.7,250.6 228.6,252.4 246.4,249.4 264.3,247.4 282.1,245.6 300.0,239.6 317.9,236.4 335.7,232.6 353.6,229.0 371.4,226.4 389.3,241.8 407.1,246.4 425.0,239.5 442.9,239.6 460.7,241.9 478.6,238.7 496.4,234.9 514.3,236.4 532.1,232.4 550.0,234.7 567.9,233.9 585.7,236.1 603.6,233.2 621.4,232.0 639.3,226.2 657.1,224.0 675.0,223.8 692.9,222.6 710.7,221.3 728.6,217.4 746.4,218.6 764.3,223.1 782.1,221.9 800.0,223.9" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linejoin="round"/><text x="805" y="162" fill="#ec4899" font-size="8" font-weight="500" dominant-baseline="middle">EWY +29.3%</text><text x="805" y="200" fill="#a855f7" font-size="8" font-weight="500" dominant-baseline="middle">DBC +18.6%</text><text x="805" y="210" fill="#f59e0b" font-size="8" font-weight="500" dominant-baseline="middle">GLD +17.6%</text><text x="805" y="220" fill="#94a3b8" font-size="8" font-weight="500" dominant-baseline="middle">SLV +15.3%</text><text x="805" y="230" fill="#22c55e" font-size="8" font-weight="500" dominant-baseline="middle">EWZ +14.4%</text><text x="805" y="240" fill="#06b6d4" font-size="9" font-weight="700" dominant-baseline="middle">Centinela v3 +11.7%</text><text x="805" y="250" fill="#f59e0b" font-size="8" font-weight="500" dominant-baseline="middle">EEM +5.3%</text><text x="805" y="260" fill="#f97316" font-size="8" font-weight="500" dominant-baseline="middle">IWM +4.3%</text><text x="805" y="270" fill="#0ea5e9" font-size="8" font-weight="500" dominant-baseline="middle">TLT +2.2%</text><text x="805" y="280" fill="#f97316" font-size="8" font-weight="500" dominant-baseline="middle">CPER +1.8%</text><text x="805" y="290" fill="#a855f7" font-size="8" font-weight="500" dominant-baseline="middle">EPOL +1.7%</text><text x="805" y="300" fill="#06b6d4" font-size="8" font-weight="500" dominant-baseline="middle">VGK +1.5%</text><text x="805" y="310" fill="#f97316" font-size="8" font-weight="500" dominant-baseline="middle">TIP +1.2%</text><text x="805" y="320" fill="#38bdf8" font-size="8" font-weight="500" dominant-baseline="middle">IEF +0.7%</text><text x="805" y="330" fill="#10b981" font-size="8" font-weight="500" dominant-baseline="middle">LQD +0.7%</text><text x="805" y="340" fill="#94a3b8" font-size="8" font-weight="500" dominant-baseline="middle">SHY +0.1%</text><text x="805" y="350" fill="#3b82f6" font-size="8" font-weight="500" dominant-baseline="middle">SPY -0.1%</text><text x="805" y="360" fill="#ef4444" font-size="8" font-weight="500" dominant-baseline="middle">EWP -0.7%</text><text x="805" y="370" fill="#8b5cf6" font-size="8" font-weight="500" dominant-baseline="middle">QQQ -0.9%</text><text x="805" y="380" fill="#ef4444" font-size="8" font-weight="500" dominant-baseline="middle">BTAL -1.3%</text><text x="805" y="390" fill="#f7931a" font-size="8" font-weight="500" dominant-baseline="middle">BTC-USD -19.0%</text></svg></div>
+  <div class="section-title">YTD Evolution 2026 — All Assets (Base 0%)</div>
+  <div class="chart-container" style="border:1px solid #334155;border-radius:8px;padding:12px"><svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="335" x2="800" y2="335" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="335" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">-20%</text><line x1="50" y1="265" x2="800" y2="265" stroke="rgba(148,163,184,0.4)" stroke-width="1"/><text x="45" y="265" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+0%</text><line x1="50" y1="195" x2="800" y2="195" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="195" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+20%</text><line x1="50" y1="125" x2="800" y2="125" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="125" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+40%</text><line x1="50" y1="55" x2="800" y2="55" stroke="rgba(148,163,184,0.15)" stroke-width="0.5"/><text x="45" y="55" text-anchor="end" fill="#94a3b8" font-size="9" dominant-baseline="middle">+60%</text><text x="50" y="415" text-anchor="middle" fill="#94a3b8" font-size="9">Jan</text><text x="407" y="415" text-anchor="middle" fill="#94a3b8" font-size="9">Feb</text><text x="746" y="415" text-anchor="middle" fill="#94a3b8" font-size="9">Mar</text><polyline points="50.0,273.1 67.9,276.8 85.7,282.6 103.6,280.9 121.4,274.8 139.3,277.7 157.1,276.3 175.0,278.9 192.9,274.1 210.7,276.3 228.6,279.2 246.4,272.9 264.3,277.7 282.1,278.2 300.0,272.9 317.9,270.4 335.7,276.3 353.6,276.3 371.4,275.5 389.3,269.0 407.1,272.1 425.0,270.9 442.9,264.3 460.7,261.4 478.6,271.9 496.4,278.7 514.3,275.0 532.1,276.3 550.0,271.2 567.9,272.4 585.7,274.3 603.6,276.5 621.4,277.0 639.3,278.0 657.1,273.8 675.0,278.5 692.9,283.6 710.7,279.2 728.6,272.4 746.4,273.8 764.3,268.2 782.1,271.4 800.0,269.2" fill="none" stroke="#ef4444" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,255.1 67.9,239.3 85.7,239.9 103.6,249.6 121.4,250.7 139.3,252.8 157.1,250.1 175.0,233.5 192.9,227.1 210.7,232.6 228.6,232.7 246.4,261.6 264.3,257.3 282.1,257.0 300.0,256.8 317.9,261.8 335.7,258.4 353.6,258.1 371.4,276.6 389.3,278.4 407.1,300.1 425.0,312.4 442.9,322.8 460.7,364.1 478.6,332.7 496.4,334.4 514.3,339.7 532.1,347.0 550.0,350.0 567.9,339.5 585.7,345.0 603.6,349.2 621.4,347.1 639.3,342.9 657.1,356.5 675.0,358.6 692.9,343.1 710.7,345.1 728.6,351.4 746.4,339.8 764.3,341.8 782.1,324.1 800.0,331.3" fill="none" stroke="#f7931a" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.6 67.9,246.7 85.7,241.7 103.6,255.3 121.4,257.6 139.3,252.9 157.1,245.6 175.0,245.5 192.9,239.4 210.7,246.7 228.6,255.0 246.4,257.3 264.3,257.6 282.1,257.8 300.0,249.2 317.9,249.0 335.7,248.6 353.6,246.6 371.4,227.2 389.3,250.1 407.1,255.6 425.0,239.6 442.9,251.5 460.7,262.0 478.6,252.0 496.4,246.7 514.3,251.1 532.1,246.4 550.0,259.3 567.9,258.8 585.7,265.0 603.6,258.6 621.4,259.0 639.3,252.7 657.1,257.6 675.0,251.4 692.9,246.6 710.7,247.1 728.6,245.6 746.4,250.5 764.3,258.4 782.1,254.7 800.0,258.6" fill="none" stroke="#f97316" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.4 67.9,257.8 85.7,257.9 103.6,261.2 121.4,256.7 139.3,256.4 157.1,251.8 175.0,249.0 192.9,248.7 210.7,251.7 228.6,252.3 246.4,247.3 264.3,243.0 282.1,243.2 300.0,236.3 317.9,234.6 335.7,229.4 353.6,224.4 371.4,218.8 389.3,232.4 407.1,246.3 425.0,236.8 442.9,236.1 460.7,242.9 478.6,239.0 496.4,235.2 514.3,236.9 532.1,233.3 550.0,242.3 567.9,241.0 585.7,245.5 603.6,235.8 621.4,232.4 639.3,229.7 657.1,227.4 675.0,227.8 692.9,227.4 710.7,227.2 728.6,221.9 746.4,210.8 764.3,209.2 782.1,205.6 800.0,199.6" fill="none" stroke="#a855f7" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,255.0 67.9,251.1 85.7,248.4 103.6,251.1 121.4,251.0 139.3,249.3 157.1,244.1 175.0,246.9 192.9,245.4 210.7,243.2 228.6,244.6 246.4,248.2 264.3,242.1 282.1,239.3 300.0,236.9 317.9,236.3 335.7,228.8 353.6,226.1 371.4,228.1 389.3,236.7 407.1,235.6 425.0,233.5 442.9,238.6 460.7,240.4 478.6,230.5 496.4,227.7 514.3,227.1 532.1,221.0 550.0,225.4 567.9,223.8 585.7,225.4 603.6,223.3 621.4,224.3 639.3,216.0 657.1,220.4 675.0,214.2 692.9,209.7 710.7,213.6 728.6,214.4 746.4,221.3 764.3,241.1 782.1,237.0 800.0,246.1" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,254.3 67.9,255.1 85.7,254.2 103.6,250.8 121.4,258.5 139.3,254.8 157.1,253.0 175.0,255.9 192.9,256.5 210.7,255.3 228.6,257.6 246.4,258.4 264.3,255.3 282.1,244.2 300.0,247.9 317.9,239.4 335.7,232.5 353.6,234.4 371.4,233.1 389.3,240.9 407.1,240.2 425.0,233.4 442.9,234.1 460.7,243.1 478.6,237.6 496.4,229.3 514.3,235.7 532.1,233.0 550.0,237.7 567.9,240.1 585.7,241.8 603.6,239.5 621.4,240.3 639.3,238.7 657.1,235.8 675.0,237.3 692.9,229.8 710.7,235.0 728.6,235.6 746.4,243.7 764.3,261.4 782.1,254.7 800.0,258.7" fill="none" stroke="#a855f7" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,259.7 67.9,257.7 85.7,260.7 103.6,261.2 121.4,259.0 139.3,261.0 157.1,258.0 175.0,259.0 192.9,257.6 210.7,262.5 228.6,260.0 246.4,265.3 264.3,260.5 282.1,258.3 300.0,256.9 317.9,251.2 335.7,244.7 353.6,252.0 371.4,248.9 389.3,249.4 407.1,245.6 425.0,249.6 442.9,246.8 460.7,256.4 478.6,248.2 496.4,241.4 514.3,244.0 532.1,245.6 550.0,250.2 567.9,253.8 585.7,248.0 603.6,245.8 621.4,250.3 639.3,244.6 657.1,242.9 675.0,243.8 692.9,236.6 710.7,237.5 728.6,243.2 746.4,251.0 764.3,270.3 782.1,259.9 800.0,267.2" fill="none" stroke="#ef4444" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,246.8 67.9,237.4 85.7,227.4 103.6,229.5 121.4,231.1 139.3,222.8 157.1,222.6 175.0,227.6 192.9,220.1 210.7,215.0 228.6,210.8 246.4,215.3 264.3,198.4 282.1,197.2 300.0,190.0 317.9,192.4 335.7,173.0 353.6,162.7 371.4,166.5 389.3,174.0 407.1,179.4 425.0,167.2 442.9,181.8 460.7,182.0 478.6,165.8 496.4,160.9 514.3,166.7 532.1,144.5 550.0,143.8 567.9,132.4 585.7,144.2 603.6,136.1 621.4,127.9 639.3,103.9 657.1,113.2 675.0,94.3 692.9,78.6 710.7,73.1 728.6,69.7 746.4,83.5 764.3,138.3 782.1,130.9 800.0,162.0" fill="none" stroke="#ec4899" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,260.1 67.9,253.6 85.7,250.0 103.6,254.6 121.4,252.6 139.3,250.6 157.1,252.0 175.0,255.3 192.9,249.5 210.7,247.3 228.6,249.4 246.4,244.4 264.3,229.0 282.1,218.7 300.0,211.7 317.9,211.4 335.7,197.3 353.6,192.5 371.4,194.8 389.3,206.7 407.1,202.2 425.0,195.7 442.9,207.4 460.7,208.1 478.6,201.0 496.4,191.5 514.3,192.6 532.1,183.3 550.0,190.7 567.9,195.5 585.7,199.0 603.6,195.8 621.4,189.4 639.3,181.0 657.1,187.6 675.0,179.9 692.9,178.6 710.7,184.0 728.6,188.1 746.4,189.1 764.3,209.1 782.1,201.7 800.0,214.2" fill="none" stroke="#22c55e" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,263.1 67.9,253.8 85.7,249.9 103.6,253.4 121.4,251.4 139.3,248.8 157.1,241.9 175.0,242.4 192.9,238.6 210.7,240.9 228.6,242.7 246.4,228.6 264.3,223.0 282.1,215.8 300.0,210.3 317.9,204.4 335.7,194.3 353.6,178.0 371.4,176.8 389.3,221.8 407.1,237.6 425.0,213.6 442.9,213.8 460.7,224.5 478.6,212.5 496.4,202.3 514.3,206.4 532.1,201.8 550.0,216.1 567.9,206.2 585.7,218.9 603.6,210.0 621.4,208.9 639.3,200.9 657.1,189.7 675.0,195.6 692.9,196.7 710.7,193.1 728.6,187.5 746.4,182.0 764.3,201.3 782.1,198.1 800.0,203.1" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.1 67.9,264.1 85.7,264.3 103.6,263.7 121.4,264.7 139.3,264.3 157.1,264.7 175.0,264.3 192.9,263.6 210.7,264.3 228.6,265.7 246.4,267.0 264.3,266.1 282.1,266.2 300.0,265.6 317.9,265.1 335.7,265.5 353.6,265.8 371.4,265.4 389.3,265.6 407.1,267.4 425.0,267.1 442.9,267.2 460.7,265.1 478.6,265.1 496.4,265.1 514.3,263.5 532.1,264.5 550.0,262.4 567.9,261.0 585.7,261.0 603.6,261.8 621.4,261.4 639.3,261.4 657.1,260.2 675.0,260.2 692.9,260.5 710.7,259.6 728.6,258.2 746.4,260.3 764.3,260.7 782.1,261.4 800.0,262.5" fill="none" stroke="#38bdf8" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,261.1 67.9,255.5 85.7,250.7 103.6,251.6 121.4,247.6 139.3,244.8 157.1,243.0 175.0,243.2 192.9,240.6 210.7,237.3 228.6,236.9 246.4,241.5 264.3,234.0 282.1,231.2 300.0,238.3 317.9,239.5 335.7,238.4 353.6,240.4 371.4,240.3 389.3,245.6 407.1,242.0 425.0,241.2 442.9,244.4 460.7,251.1 478.6,238.0 496.4,235.3 514.3,236.4 532.1,238.1 550.0,245.8 567.9,240.9 585.7,240.8 603.6,239.4 621.4,238.6 639.3,238.6 657.1,244.4 675.0,240.4 692.9,238.6 710.7,236.6 728.6,243.1 746.4,239.7 764.3,246.2 782.1,242.6 800.0,249.7" fill="none" stroke="#f97316" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.9 67.9,263.9 85.7,263.9 103.6,263.7 121.4,264.7 139.3,263.4 157.1,263.8 175.0,263.0 192.9,262.2 210.7,262.6 228.6,263.6 246.4,265.7 264.3,263.6 282.1,263.0 300.0,262.8 317.9,262.5 335.7,262.9 353.6,263.4 371.4,263.3 389.3,263.6 407.1,265.2 425.0,265.1 442.9,265.5 460.7,263.8 478.6,263.6 496.4,263.6 514.3,262.8 532.1,263.2 550.0,261.5 567.9,260.4 585.7,260.0 603.6,260.4 621.4,260.1 639.3,260.4 657.1,260.0 675.0,260.1 692.9,260.2 710.7,260.0 728.6,260.1 746.4,261.3 764.3,261.4 782.1,261.1 800.0,262.5" fill="none" stroke="#10b981" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.5 67.9,262.7 85.7,259.6 103.6,259.3 121.4,261.3 139.3,257.8 157.1,257.5 175.0,258.0 192.9,261.8 210.7,260.6 228.6,260.9 246.4,268.4 264.3,263.7 282.1,261.1 300.0,260.0 317.9,258.5 335.7,255.2 353.6,254.0 371.4,256.2 389.3,260.5 407.1,258.1 425.0,263.6 442.9,269.7 460.7,274.7 478.6,267.5 496.4,264.8 514.3,266.4 532.1,265.5 550.0,272.6 567.9,271.9 585.7,272.2 603.6,269.7 621.4,271.0 639.3,268.0 657.1,272.2 675.0,268.5 692.9,263.5 710.7,267.7 728.6,268.8 746.4,268.4 764.3,272.1 782.1,266.9 800.0,267.9" fill="none" stroke="#8b5cf6" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.7 67.9,264.5 85.7,264.5 103.6,264.5 121.4,264.7 139.3,264.8 157.1,264.8 175.0,264.7 192.9,264.6 210.7,264.9 228.6,264.9 246.4,264.9 264.3,264.7 282.1,264.9 300.0,264.7 317.9,264.6 335.7,264.5 353.6,264.5 371.4,264.4 389.3,264.1 407.1,265.3 425.0,265.4 442.9,265.2 460.7,264.7 478.6,264.7 496.4,264.6 514.3,264.4 532.1,264.7 550.0,264.4 567.9,263.8 585.7,263.9 603.6,264.1 621.4,264.1 639.3,264.1 657.1,263.8 675.0,263.8 692.9,263.9 710.7,263.8 728.6,263.3 746.4,263.9 764.3,264.0 782.1,264.2 800.0,264.4" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,257.6 67.9,239.5 85.7,214.3 103.6,229.3 121.4,236.1 139.3,221.5 157.1,195.2 175.0,187.7 192.9,155.3 210.7,162.0 228.6,174.5 246.4,150.8 264.3,158.6 282.1,141.3 300.0,109.9 317.9,80.3 335.7,62.7 353.6,40.9 371.4,41.0 389.3,204.9 407.1,221.2 425.0,196.6 442.9,184.5 460.7,252.5 478.6,233.4 496.4,201.6 514.3,215.9 532.1,198.8 550.0,246.8 567.9,236.0 585.7,254.2 603.6,234.0 621.4,229.0 639.3,198.5 657.1,177.0 675.0,185.1 692.9,179.9 710.7,177.6 728.6,153.0 746.4,171.6 764.3,209.0 782.1,205.4 800.0,211.3" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,264.2 67.9,261.8 85.7,259.7 103.6,260.9 121.4,260.9 139.3,258.6 157.1,258.0 175.0,258.7 192.9,260.5 210.7,259.5 228.6,259.8 246.4,267.1 264.3,263.0 282.1,261.2 300.0,261.1 317.9,259.3 335.7,257.8 353.6,257.9 371.4,258.6 389.3,259.7 407.1,257.9 425.0,260.9 442.9,262.6 460.7,267.0 478.6,260.4 496.4,258.6 514.3,259.6 532.1,259.7 550.0,265.2 567.9,264.9 585.7,264.3 603.6,262.6 621.4,263.5 639.3,261.0 657.1,264.6 675.0,262.0 692.9,259.1 710.7,261.0 728.6,262.7 746.4,262.5 764.3,265.6 782.1,263.2 800.0,265.1" fill="none" stroke="#3b82f6" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.0 67.9,264.0 85.7,264.3 103.6,263.7 121.4,264.4 139.3,264.0 157.1,264.0 175.0,263.6 192.9,263.3 210.7,263.8 228.6,264.5 246.4,265.5 264.3,264.2 282.1,264.5 300.0,263.8 317.9,263.3 335.7,263.3 353.6,263.1 371.4,262.9 389.3,263.0 407.1,263.9 425.0,263.4 442.9,263.7 460.7,262.7 478.6,262.4 496.4,262.1 514.3,261.4 532.1,262.0 550.0,260.6 567.9,260.1 585.7,260.6 603.6,260.8 621.4,260.6 639.3,260.7 657.1,260.4 675.0,260.4 692.9,260.0 710.7,259.1 728.6,258.5 746.4,259.5 764.3,259.8 782.1,260.6 800.0,260.6" fill="none" stroke="#f97316" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,265.3 67.9,263.6 85.7,264.3 103.6,262.3 121.4,264.1 139.3,261.7 157.1,262.8 175.0,262.2 192.9,260.1 210.7,260.2 228.6,262.2 246.4,266.9 264.3,264.2 282.1,262.7 300.0,261.7 317.9,260.0 335.7,262.2 353.6,263.1 371.4,263.0 389.3,264.9 407.1,267.3 425.0,266.4 442.9,267.3 460.7,263.5 478.6,263.3 496.4,263.4 514.3,259.3 532.1,261.2 550.0,256.5 567.9,254.5 585.7,253.9 603.6,255.3 621.4,254.9 639.3,255.8 657.1,254.5 675.0,253.8 692.9,253.8 710.7,252.3 728.6,250.1 746.4,253.8 764.3,254.5 782.1,255.6 800.0,257.1" fill="none" stroke="#0ea5e9" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,260.8 67.9,258.0 85.7,257.2 103.6,258.2 121.4,258.2 139.3,255.8 157.1,253.8 175.0,255.7 192.9,254.3 210.7,255.2 228.6,254.1 246.4,259.2 264.3,255.6 282.1,253.5 300.0,250.9 317.9,248.5 335.7,242.6 353.6,247.1 371.4,245.1 389.3,248.5 407.1,245.6 425.0,247.0 442.9,246.5 460.7,251.6 478.6,244.4 496.4,240.3 514.3,241.3 532.1,240.4 550.0,243.3 567.9,243.5 585.7,241.3 603.6,240.0 621.4,241.6 639.3,238.0 657.1,240.2 675.0,239.2 692.9,236.0 710.7,236.2 728.6,237.3 746.4,245.3 764.3,256.4 782.1,252.3 800.0,259.6" fill="none" stroke="#06b6d4" stroke-width="1.3" stroke-linejoin="round" opacity="0.5"/><polyline points="50.0,263.3 67.9,259.3 85.7,257.6 103.6,259.8 121.4,258.6 139.3,257.1 157.1,253.0 175.0,253.3 192.9,248.8 210.7,250.6 228.6,252.4 246.4,249.4 264.3,247.4 282.1,245.6 300.0,239.6 317.9,236.4 335.7,232.6 353.6,229.0 371.4,226.4 389.3,241.8 407.1,246.4 425.0,239.5 442.9,239.6 460.7,241.9 478.6,238.7 496.4,234.9 514.3,236.4 532.1,232.4 550.0,234.7 567.9,233.9 585.7,236.1 603.6,233.2 621.4,232.0 639.3,226.2 657.1,224.0 675.0,223.8 692.9,222.6 710.7,221.3 728.6,217.4 746.4,218.6 764.3,223.1 782.1,221.9 800.0,223.9" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linejoin="round"/><text x="805" y="162" fill="#ec4899" font-size="8" font-weight="500" dominant-baseline="middle">EWY +29.3%</text><text x="805" y="200" fill="#a855f7" font-size="8" font-weight="500" dominant-baseline="middle">DBC +18.6%</text><text x="805" y="210" fill="#f59e0b" font-size="8" font-weight="500" dominant-baseline="middle">GLD +17.6%</text><text x="805" y="220" fill="#94a3b8" font-size="8" font-weight="500" dominant-baseline="middle">SLV +15.3%</text><text x="805" y="230" fill="#22c55e" font-size="8" font-weight="500" dominant-baseline="middle">EWZ +14.4%</text><text x="805" y="240" fill="#06b6d4" font-size="9" font-weight="700" dominant-baseline="middle">Centinela v3 +11.7%</text><text x="805" y="250" fill="#f59e0b" font-size="8" font-weight="500" dominant-baseline="middle">EEM +5.3%</text><text x="805" y="260" fill="#f97316" font-size="8" font-weight="500" dominant-baseline="middle">IWM +4.3%</text><text x="805" y="270" fill="#0ea5e9" font-size="8" font-weight="500" dominant-baseline="middle">TLT +2.2%</text><text x="805" y="280" fill="#f97316" font-size="8" font-weight="500" dominant-baseline="middle">CPER +1.8%</text><text x="805" y="290" fill="#a855f7" font-size="8" font-weight="500" dominant-baseline="middle">EPOL +1.7%</text><text x="805" y="300" fill="#06b6d4" font-size="8" font-weight="500" dominant-baseline="middle">VGK +1.5%</text><text x="805" y="310" fill="#f97316" font-size="8" font-weight="500" dominant-baseline="middle">TIP +1.2%</text><text x="805" y="320" fill="#38bdf8" font-size="8" font-weight="500" dominant-baseline="middle">IEF +0.7%</text><text x="805" y="330" fill="#10b981" font-size="8" font-weight="500" dominant-baseline="middle">LQD +0.7%</text><text x="805" y="340" fill="#94a3b8" font-size="8" font-weight="500" dominant-baseline="middle">SHY +0.1%</text><text x="805" y="350" fill="#3b82f6" font-size="8" font-weight="500" dominant-baseline="middle">SPY -0.1%</text><text x="805" y="360" fill="#ef4444" font-size="8" font-weight="500" dominant-baseline="middle">EWP -0.7%</text><text x="805" y="370" fill="#8b5cf6" font-size="8" font-weight="500" dominant-baseline="middle">QQQ -0.9%</text><text x="805" y="380" fill="#ef4444" font-size="8" font-weight="500" dominant-baseline="middle">BTAL -1.3%</text><text x="805" y="390" fill="#f7931a" font-size="8" font-weight="500" dominant-baseline="middle">BTC-USD -19.0%</text></svg></div>
   <div style="margin-top:6px;font-size:9px;color:#64748b">
-    Retorno acumulado desde el 1 de enero 2026. <span style="color:#06b6d4;font-weight:700">Linea cyan = Centinela v3.</span>
+    Cumulative return since January 1, 2026. <span style="color:#06b6d4;font-weight:700">Cyan line = Centinela v3.</span>
   </div>
 
   <div style="margin-top:24px">
@@ -548,7 +548,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
     <table class="data-table" style="max-width:600px">
         <tr><th></th><th class="num" style="color:#06b6d4">Centinela v3</th><th class="num" style="color:#3b82f6">SPY</th><th class="num" style="color:#f59e0b">60/40</th></tr>
         <tr><td style="color:#94a3b8;font-weight:600">YTD</td><td class="num" style="font-weight:700;color:#10b981">+11.69%</td><td class="num" style="color:#e2e8f0">-0.09%</td><td class="num" style="color:#e2e8f0">+0.86%</td></tr>
-        <tr><td style="color:#94a3b8;font-weight:600">Volatilidad</td><td class="num" style="color:#e2e8f0">+15.45%</td><td class="num" style="color:#e2e8f0">+11.48%</td><td class="num" style="font-weight:700;color:#10b981">+7.55%</td></tr>
+        <tr><td style="color:#94a3b8;font-weight:600">Volatility</td><td class="num" style="color:#e2e8f0">+15.45%</td><td class="num" style="color:#e2e8f0">+11.48%</td><td class="num" style="font-weight:700;color:#10b981">+7.55%</td></tr>
         <tr><td style="color:#94a3b8;font-weight:600">Sharpe</td><td class="num" style="font-weight:700;color:#10b981">+4.00</td><td class="num" style="color:#e2e8f0">-0.36</td><td class="num" style="color:#e2e8f0">+0.13</td></tr>
         <tr><td style="color:#94a3b8;font-weight:600">Sortino</td><td class="num" style="font-weight:700;color:#10b981">+4.16</td><td class="num" style="color:#e2e8f0">-0.50</td><td class="num" style="color:#e2e8f0">+0.18</td></tr>
         <tr><td style="color:#94a3b8;font-weight:600">Max Drawdown</td><td class="num" style="color:#e2e8f0">-5.14%</td><td class="num" style="color:#e2e8f0">-2.57%</td><td class="num" style="font-weight:700;color:#10b981">-2.02%</td></tr>
@@ -562,9 +562,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
   </div>
 
   <div style="margin-top:24px">
-    <div class="section-title">Historial de Rebalanceos</div>
+    <div class="section-title">Rebalancing History</div>
     <table class="data-table">
-      <tr><th>Fecha</th><th>Equity</th><th>Bonds</th><th>Hard Assets</th><th class="num">Eq Exp</th><th class="num">HA Exp</th><th class="num">Cmdty</th></tr>
+      <tr><th>Date</th><th>Equity</th><th>Bonds</th><th>Hard Assets</th><th class="num">Eq Exp</th><th class="num">HA Exp</th><th class="num">Cmdty</th></tr>
       <tr>
             <td>2026-03-02</td>
             <td style="color:#10b981">EWY, EWZ, EEM</td>
@@ -594,8 +594,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; colo
   </div>
 
   <div class="footer">
-    <span>SFinance-alicIA | Centinela v3 LIVE | Solo fines informativos, no es asesoria financiera</span>
-    <span>Senal: 2026-03-05 | 11 posiciones | 43 dias de NAV | SMA200 min 30%</span>
+    <span>SFinance-alicIA | Centinela v3 LIVE | For informational purposes only, not financial advice</span>
+    <span>Signal: 2026-03-05 | 11 positions | 43 NAV days | SMA200 min 30%</span>
   </div>
 
   </div><!-- end tab-live -->
