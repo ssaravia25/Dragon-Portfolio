@@ -715,7 +715,6 @@ if ALERT_MODE:
             msg["Subject"] = subject
             msg["From"] = GMAIL_SENDER
             msg["To"] = GMAIL_SENDER
-            msg["Bcc"] = ", ".join(EMAIL_RECIPIENTS)
             msg.attach(MIMEText(html_body, "html"))
             try:
                 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
@@ -1808,7 +1807,6 @@ def send_daily_email():
     msg["Subject"] = subject
     msg["From"] = GMAIL_SENDER
     msg["To"] = GMAIL_SENDER
-    msg["Bcc"] = ", ".join(EMAIL_RECIPIENTS)
     msg.attach(MIMEText(build_daily_email_html(), "html"))
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
