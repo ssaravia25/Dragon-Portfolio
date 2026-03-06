@@ -38,6 +38,7 @@ EXIT_BLOCKS = {"Equity", "HardAssets"}  # Blocks with exit signal
 
 START = "2006-03-01"
 TODAY = datetime.date.today()
+TOMORROW = TODAY + datetime.timedelta(days=1)
 LIVE_YEAR = TODAY.year
 RF_ANNUAL = 0.043
 BTAL_LEVERAGE = 1.0
@@ -125,7 +126,7 @@ if not cached:
     print("Fetching data from Yahoo Finance...")
     prices = {}
     for ticker in ALL_TICKERS:
-        df = yf.download(ticker, start=START, end=str(TODAY), progress=False, auto_adjust=True)
+        df = yf.download(ticker, start=START, end=str(TOMORROW), progress=False, auto_adjust=True)
         if len(df) > 100:
             prices[ticker] = df[["Close"]].copy()
             prices[ticker].columns = [ticker]
