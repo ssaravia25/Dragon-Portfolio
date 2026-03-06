@@ -2,8 +2,10 @@ name: Daily Portfolio Update
 
 on:
   schedule:
-    - cron: '0 19 * * 1-5'    # 15:00 ET (EDT, Mar-Nov)
-    - cron: '0 20 * * 1-5'    # 15:00 ET (EST, Nov-Mar)
+    - cron: '0 18 * * 1-5'    # 14:00 ET (EDT, Mar-Nov) — pre-close alert
+    - cron: '0 19 * * 1-5'    # 15:00 ET (EDT, Mar-Nov) — post-close full run
+    - cron: '0 19 * * 1-5'    # 14:00 ET (EST, Nov-Mar) — pre-close alert
+    - cron: '0 20 * * 1-5'    # 15:00 ET (EST, Nov-Mar) — post-close full run
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 permissions:
@@ -13,15 +15,29 @@ jobs:
   update-reports:
     runs-on: ubuntu-latest
     steps:
-      - name: Skip if not 3pm NY (avoid double run from dual cron)
+      - name: Determine run mode (pre-close alert vs full run)
         id: timecheck
         run: |
           NY_HOUR=$(TZ=America/New_York date +%H)
           echo "NY hour: $NY_HOUR"
-          if [ "$NY_HOUR" != "15" ] && [ "$GITHUB_EVENT_NAME" == "schedule" ]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
+          if [ "$GITHUB_EVENT_NAME" == "schedule" ]; then
+            if [ "$NY_HOUR" == "14" ]; then
+              echo "skip=false" >> $GITHUB_OUTPUT
+              echo "mode=alert" >> $GITHUB_OUTPUT
+              echo "Mode: pre-close alert (2pm NY)"
+            elif [ "$NY_HOUR" == "15" ]; then
+              echo "skip=false" >> $GITHUB_OUTPUT
+              echo "mode=full" >> $GITHUB_OUTPUT
+              echo "Mode: full run (3pm NY)"
+            else
+              echo "skip=true" >> $GITHUB_OUTPUT
+              echo "mode=skip" >> $GITHUB_OUTPUT
+              echo "Skipping: not 2pm or 3pm NY"
+            fi
           else
             echo "skip=false" >> $GITHUB_OUTPUT
+            echo "mode=full" >> $GITHUB_OUTPUT
+            echo "Mode: manual trigger (full run)"
           fi
 
       - name: Checkout
@@ -43,18 +59,19 @@ jobs:
         if: steps.timecheck.outputs.skip != 'true'
         run: rm -f price_cache.json
 
-      - name: Run dragon_sma200.py (backtest)
-        if: steps.timecheck.outputs.skip != 'true'
+      - name: Run dragon_sma200.py (backtest, full run only)
+        if: steps.timecheck.outputs.skip != 'true' && steps.timecheck.outputs.mode == 'full'
         run: python dragon_sma200.py
 
       - name: Run dragon_live.py (live dashboard + email)
         if: steps.timecheck.outputs.skip != 'true'
         env:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_MODE: ${{ steps.timecheck.outputs.mode == 'alert' && '1' || '' }}
         run: python dragon_live.py
 
-      - name: Commit updated reports
-        if: steps.timecheck.outputs.skip != 'true'
+      - name: Commit updated reports (full run only)
+        if: steps.timecheck.outputs.skip != 'true' && steps.timecheck.outputs.mode == 'full'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
