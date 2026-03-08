@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Iberic Centinel — Dragon Portfolio UCITS + SMA50 Exit Filter (REALISTIC)
+Iberic Centinela — Dragon Portfolio UCITS + SMA50 Exit Filter (REALISTIC)
 Based on "The Allegory of the Hawk and Serpent" (Artemis Capital, Jan 2020)
 
 UCITS-compliant ETFs for European retail investors (PRIIPs/KID compliant).
@@ -97,7 +97,7 @@ COLORS = {
 # ═══════════════════════════════════════════════════════════════════
 CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "price_cache_iberic.json")
 
-print("═══ Iberic Centinel — Dragon UCITS + JPM Abs Alpha + SMA50 Exit ═══\n")
+print("═══ Iberic Centinela — Dragon UCITS + JPM Abs Alpha + SMA50 Exit ═══\n")
 
 def load_cache():
     if not os.path.exists(CACHE_FILE):
@@ -221,7 +221,7 @@ for t in LATE_JOINERS:
             print(f"  {t} first valid return: {first_valid}")
 
 # ═══════════════════════════════════════════════════════════════════
-# 3. DUAL SMA COMPUTATION (SMA200 trend + SMA50 exit — same as Centinela v3)
+# 3. DUAL SMA COMPUTATION (SMA200 trend + SMA50 exit — same as Centinelaa v3)
 # ═══════════════════════════════════════════════════════════════════
 print("\nComputing Dual SMA signals (SMA200 trend + SMA50 exit)...")
 
@@ -309,7 +309,7 @@ for i in range(N_ret):
             log_entry[block] = {"picks": list(current_sel[block]), "scores": scores}
         selection_log.append(log_entry)
 
-    # SMA200 exposure scaling (daily, like Centinela v3)
+    # SMA200 exposure scaling (daily, like Centinelaa v3)
     for block in UNIVERSES:
         selections[block].append(list(current_sel[block]))
         picks_b = current_sel[block]
@@ -334,7 +334,7 @@ for block in ["Equity", "Bonds", "HardAssets"]:
     print(f"  {block:12s} SMA200 exposure: avg {avg_exp:.0%} | 100%: {full_pct:.0f}% days | {MIN_EXPOSURE:.0%}: {min_pct:.0f}% days")
 
 # ═══════════════════════════════════════════════════════════════════
-# 4. STRATEGY CONSTRUCTION (Dual SMA — same logic as Centinela v3)
+# 4. STRATEGY CONSTRUCTION (Dual SMA — same logic as Centinelaa v3)
 # ═══════════════════════════════════════════════════════════════════
 print("\nConstructing strategies (Dual SMA)...")
 
@@ -346,7 +346,7 @@ print(f"  Cash destination: {shy_ucits} (UCITS SHY equivalent)")
 def dynamic_block_returns_dual_sma(block_name, use_sma_filter=True, use_exit_signal=False):
     """Equal-weight average of top-N selected, with SMA200 exposure scaling.
     If use_exit_signal=True, assets below SMA50 exit to SHY with TX_COST_BPS per switch.
-    Same architecture as Centinela v3."""
+    Same architecture as Centinelaa v3."""
     r = np.zeros(N_ret)
     exit_count = 0
     switch_count = 0
@@ -397,7 +397,7 @@ def dynamic_block_returns_dual_sma(block_name, use_sma_filter=True, use_exit_sig
             r[i] = risk_ret
     return r, exit_count, switch_count
 
-# SMA200-filtered + SMA50 exit on Equity & Hard Assets (not Bonds — same as Centinela)
+# SMA200-filtered + SMA50 exit on Equity & Hard Assets (not Bonds — same as Centinelaa)
 ret_equity, eq_exits, eq_sw = dynamic_block_returns_dual_sma("Equity", True, "Equity" in EXIT_BLOCKS)
 eq_label = f"SMA200 + SMA{SMA_EXIT} exit @{TX_COST_BPS}bp" if "Equity" in EXIT_BLOCKS else "SMA200"
 print(f"  + Equity ({eq_label}, top-{N_SELECT} from {len(UNIVERSES['Equity'])}): {N_ret} days, {eq_exits} exits, {eq_sw} switches")
@@ -426,7 +426,7 @@ else:
     print(f"  + Long Volatility (SYNTHETIC — no JPM fund data): {N_ret} days")
     print(f"    Using inverse {spy_ucits} x0.3 as crude proxy")
 
-# Commodity Trend with SMA200 gate + SMA50 deviation sizing (same as Centinela)
+# Commodity Trend with SMA200 gate + SMA50 deviation sizing (same as Centinelaa)
 cmdty_ticker = UNIVERSES["Commodities"][0] if UNIVERSES["Commodities"] else None
 if cmdty_ticker and cmdty_ticker in ret:
     cmdty_prices = price_data[cmdty_ticker]
@@ -523,7 +523,7 @@ nav_serpent = cum_nav(serpent_ret)
 nav_hawk = cum_nav(hawk_ret)
 
 rebal_count = sum(1 for i in range(1, N_ret) if dates_ret[i].month != dates_ret[i-1].month) + 1
-print(f"  + Iberic Centinel: ${nav_dragon[-1]:.2f} (from $1) [{rebal_count} rebalances]")
+print(f"  + Iberic Centinela: ${nav_dragon[-1]:.2f} (from $1) [{rebal_count} rebalances]")
 print(f"  + 60/40 UCITS:     ${nav_6040[-1]:.2f}")
 print(f"  + {spy_ucits}:         ${nav_spy[-1]:.2f}")
 
@@ -554,7 +554,7 @@ def calc_metrics(returns, name=""):
         "ret_to_risk": ret_to_risk, "total": total * 100, "years": years,
     }
 
-m_dragon = calc_metrics(dragon_ret, "Iberic Centinel")
+m_dragon = calc_metrics(dragon_ret, "Iberic Centinela")
 m_6040 = calc_metrics(port_6040_ret, "60/40 UCITS")
 m_spy = calc_metrics(spy_ret, spy_ucits)
 m_serpent = calc_metrics(serpent_ret, "Serpiente")
@@ -1029,7 +1029,7 @@ html = f'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iberic Centinel — Dragon UCITS + JPM + SMA50 | SFinance</title>
+<title>Iberic Centinela — Dragon UCITS + JPM + SMA50 | SFinance</title>
 <style>
 * {{ margin:0; padding:0; box-sizing:border-box; }}
 body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; color:#e2e8f0; }}
@@ -1091,7 +1091,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
 
   <div class="header">
     <div>
-      <div class="header-title"><span>Iberic Centinel</span> — Dragon UCITS + SMA50 Exit</div>
+      <div class="header-title"><span>Iberic Centinela</span> — Dragon UCITS + SMA50 Exit</div>
       <div style="font-size:10px;color:#64748b;margin-top:2px">
         <span class="ucits-badge">UCITS / PRIIPs</span>
         <span class="sma-badge">SMA50 EXIT</span>
@@ -1102,10 +1102,10 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div class="card" style="margin-bottom:24px;border-left:3px solid #fbbf24;padding:16px 20px">
-    <div style="font-size:12px;font-weight:800;color:#fbbf24;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Iberic Centinel — Dragon Portfolio + JPM Absolute Alpha + SMA50 Exit</div>
+    <div style="font-size:12px;font-weight:800;color:#fbbf24;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Iberic Centinela — Dragon Portfolio + JPM Absolute Alpha + SMA50 Exit</div>
     <div style="font-size:10px;color:#cbd5e1;line-height:1.8">
       <p>Combina el <strong style="color:#e2e8f0">Dragon Portfolio</strong> (Artemis Capital) con <strong style="color:#60a5fa">ETFs UCITS</strong> y el fondo <strong style="color:#fbbf24">JPM Europe Equity Absolute Alpha D (Perf) Acc EUR</strong> (ISIN: LU1176912761) como sustituto de BTAL en el bloque Long Volatility.</p>
-      <p style="margin-top:6px"><strong style="color:#06b6d4">Doble SMA (Centinela v3):</strong> <strong style="color:#e2e8f0">SMA200</strong> escala la exposicion por bloque (30%-100%) segun cuantos picks estan sobre su SMA200. <strong style="color:#fbbf24">SMA{SMA_EXIT}</strong> genera senales de salida intra-mes a <strong style="color:#e2e8f0">{shy_ucits}</strong> (bonos cortos) en bloques Equity y Hard Assets, con {TX_COST_BPS}bp por switch.</p>
+      <p style="margin-top:6px"><strong style="color:#06b6d4">Doble SMA (Centinelaa v3):</strong> <strong style="color:#e2e8f0">SMA200</strong> escala la exposicion por bloque (30%-100%) segun cuantos picks estan sobre su SMA200. <strong style="color:#fbbf24">SMA{SMA_EXIT}</strong> genera senales de salida intra-mes a <strong style="color:#e2e8f0">{shy_ucits}</strong> (bonos cortos) en bloques Equity y Hard Assets, con {TX_COST_BPS}bp por switch.</p>
       <p style="margin-top:6px"><strong style="color:#10b981">Exposicion media:</strong> {avg_exposure:.0f}% | Floor: {MIN_EXPOSURE:.0%} minimo (nunca 0%). Cash → {shy_ucits} (~bonos cortos, no 0%).</p>
     </div>
   </div>
@@ -1135,7 +1135,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="section-title">Crecimiento de $1 — Escala Logaritmica</div>
     <div class="chart-container">{build_main_chart()}</div>
     <div class="legend-row">
-      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div><strong style="color:#fbbf24">Iberic Centinel</strong> ${nav_dragon[-1]:.2f}</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div><strong style="color:#fbbf24">Iberic Centinela</strong> ${nav_dragon[-1]:.2f}</div>
       <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>60/40 ${nav_6040[-1]:.2f}</div>
       <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>{spy_ucits} ${nav_spy[-1]:.2f}</div>
     </div>
@@ -1206,7 +1206,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
     <div class="legend-row">
       <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div><span style="color:#10b981">Serpiente</span> ${nav_serpent[-1]:.2f}</div>
       <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div><span style="color:#f59e0b">Halcon</span> ${nav_hawk[-1]:.2f}</div>
-      <div class="legend-item"><svg width="20" height="8"><line x1="0" y1="4" x2="20" y2="4" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4,3"/></svg><span style="color:#fbbf24">Iberic Centinel</span> ${nav_dragon[-1]:.2f}</div>
+      <div class="legend-item"><svg width="20" height="8"><line x1="0" y1="4" x2="20" y2="4" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4,3"/></svg><span style="color:#fbbf24">Iberic Centinela</span> ${nav_dragon[-1]:.2f}</div>
     </div>
   </div>
 
@@ -1223,10 +1223,10 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div class="section">
-    <div class="section-title">Drawdown — Iberic Centinel vs 60/40</div>
+    <div class="section-title">Drawdown — Iberic Centinela vs 60/40</div>
     <div class="chart-container">{build_drawdown_chart()}</div>
     <div class="legend-row">
-      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div><span style="color:#fbbf24">Iberic Centinel</span> MDD: {m_dragon['mdd']:.1f}%</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div><span style="color:#fbbf24">Iberic Centinela</span> MDD: {m_dragon['mdd']:.1f}%</div>
       <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div><span style="color:#94a3b8">60/40</span> MDD: {m_6040['mdd']:.1f}%</div>
     </div>
   </div>
@@ -1320,7 +1320,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div class="footer">
-    <span>SFinance-alicIA | Iberic Centinel | Solo fines informativos — No es asesoramiento financiero</span>
+    <span>SFinance-alicIA | Iberic Centinela | Solo fines informativos — No es asesoramiento financiero</span>
     <span>{TODAY.strftime("%Y-%m-%d")} | {len(ALL_TICKERS)} activos UCITS | SMA50 Exit | Backtest {dates[0]} &rarr; {dates[-1]}</span>
   </div>
 
@@ -1331,7 +1331,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
 # ═══════════════════════════════════════════════════════════════════
 # 13. OUTPUT
 # ═══════════════════════════════════════════════════════════════════
-outpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Iberic_Centinel_Backtest.html")
+outpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Iberic_Centinela_Backtest.html")
 with open(outpath, "w", encoding="utf-8") as f:
     f.write(html)
 print(f"\n  Report saved: {outpath}")

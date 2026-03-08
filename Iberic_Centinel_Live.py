@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Iberic Centinel — Dual SMA — Live Dashboard (2026)
+Iberic Centinela — Dual SMA — Live Dashboard (2026)
 UCITS-compliant Dragon Portfolio. Dual SMA: SMA200 exposure + SMA50 exit.
 $10,000 initial capital. Daily email with SMA50 alerts + monthly rebalancing.
 ALERT_MODE=1 env var → pre-close lightweight run (skip HTML, only send alerts).
@@ -84,7 +84,7 @@ TICKER_COLORS = {
 # ═══════════════════════════════════════════════════════════════════
 CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "price_cache_iberic.json")
 
-print(f"═══ Iberic Centinel — Dual SMA — Live Dashboard {LIVE_YEAR} ═══\n")
+print(f"═══ Iberic Centinela — Dual SMA — Live Dashboard {LIVE_YEAR} ═══\n")
 
 def _market_is_closed():
     """True if European markets are closed (after 16:35 GMT / LSE close)."""
@@ -710,11 +710,11 @@ if ALERT_MODE:
     gmail_pass = os.environ.get("GMAIL_APP_PASSWORD")
     if gmail_pass:
         if sma50_new_exits:
-            subject = f"PRE-CLOSE — SELL {', '.join(sma50_new_exits)} MOC | Iberic Centinel"
+            subject = f"PRE-CLOSE — SELL {', '.join(sma50_new_exits)} MOC | Iberic Centinela"
         elif sma50_new_entries:
-            subject = f"PRE-CLOSE — BUY {', '.join(sma50_new_entries)} MOC | Iberic Centinel"
+            subject = f"PRE-CLOSE — BUY {', '.join(sma50_new_entries)} MOC | Iberic Centinela"
         elif sma50_watch:
-            subject = f"PRE-CLOSE WATCH — Assets near SMA50 | Iberic Centinel"
+            subject = f"PRE-CLOSE WATCH — Assets near SMA50 | Iberic Centinela"
         else:
             subject = f"Pre-Close — No signals | NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}%"
 
@@ -744,7 +744,7 @@ if ALERT_MODE:
         mtd_color = "#10b981" if mtd_ret >= 0 else "#ef4444"
 
         html_body = f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
-            <h2 style="color:#f59e0b;margin-bottom:4px">Iberic Centinel — Pre-Close Status</h2>
+            <h2 style="color:#f59e0b;margin-bottom:4px">Iberic Centinela — Pre-Close Status</h2>
             <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} — Based on European market close prices</p>
             <div style="background:#0f172a;padding:16px;border-radius:8px;margin-bottom:16px">
                 <div style="display:flex;justify-content:space-between;margin-bottom:8px">
@@ -760,7 +760,7 @@ if ALERT_MODE:
             <h3 style="color:#94a3b8;font-size:11px;text-transform:uppercase;margin-bottom:8px">SMA50 Signals</h3>
             {signal_html}
             <p style="margin-top:16px;font-size:10px;color:#475569">Based on European market close prices. Final confirmation at post-close email.</p>
-            <p style="font-size:10px;color:#475569">SFinance-alicIA | Iberic Centinel Dual SMA</p>
+            <p style="font-size:10px;color:#475569">SFinance-alicIA | Iberic Centinela Dual SMA</p>
         </div>"""
 
         msg = MIMEMultipart("alternative")
@@ -916,7 +916,7 @@ def build_ytd_chart():
         svg += f'<polyline points="{" ".join(pts)}" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linejoin="round"/>'
     all_labels = [(t, end_vals[t], TICKER_COLORS.get(t, "#9ca3af"), "8", "500") for t in end_vals]
     if len(ytd_dragon_pct) > 0:
-        all_labels.append(("Iberic Centinel", float(ytd_dragon_pct[-1]), "#06b6d4", "9", "700"))
+        all_labels.append(("Iberic Centinela", float(ytd_dragon_pct[-1]), "#06b6d4", "9", "700"))
     all_labels.sort(key=lambda x: -x[1])
     placed = []
     for name, val, color, fsize, fweight in all_labels:
@@ -1247,7 +1247,7 @@ def benchmark_table_html():
         return f'<tr><td style="color:#94a3b8;font-weight:600">{label}</td>{cells}</tr>'
 
     return f'''<table class="data-table" style="max-width:600px">
-        <tr><th></th><th class="num" style="color:#06b6d4">Iberic Centinel</th><th class="num" style="color:#3b82f6">{spy_ucits}</th><th class="num" style="color:#f59e0b">60/40</th></tr>
+        <tr><th></th><th class="num" style="color:#06b6d4">Iberic Centinela</th><th class="num" style="color:#3b82f6">{spy_ucits}</th><th class="num" style="color:#f59e0b">60/40</th></tr>
         {row("YTD", metrics_dragon["ytd"], metrics_spy["ytd"], metrics_6040["ytd"])}
         {row("Volatility", metrics_dragon["vol"], metrics_spy["vol"], metrics_6040["vol"], higher_better=False)}
         {row("Sharpe", metrics_dragon["sharpe"], metrics_spy["sharpe"], metrics_6040["sharpe"], is_pct=False)}
@@ -1333,7 +1333,7 @@ html = f'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iberic Centinel LIVE | SFinance-alicIA</title>
+<title>Iberic Centinela LIVE | SFinance-alicIA</title>
 <style>
 * {{ margin:0; padding:0; box-sizing:border-box; }}
 body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; color:#e2e8f0; }}
@@ -1424,7 +1424,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
 
   <div class="header">
     <div class="header-left">
-      <h1><span>Iberic</span> Centinel <span class="live-badge">LIVE</span></h1>
+      <h1><span>Iberic</span> Centinela <span class="live-badge">LIVE</span></h1>
       <div class="subtitle">Dual SMA (SMA200 + Exit SMA{SMA_EXIT}) | Top-{N_SELECT} Momentum {MOM_LOOKBACK}d | Monthly Rebalance | ${INITIAL_CAPITAL:,} initial | UCITS</div>
     </div>
     <div class="header-right">
@@ -1515,7 +1515,7 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   <div class="section-title">YTD Evolution {LIVE_YEAR} — All Assets (Base 0%)</div>
   <div class="chart-container" style="border:1px solid #334155;border-radius:8px;padding:12px">{build_ytd_chart()}</div>
   <div style="margin-top:6px;font-size:9px;color:#64748b">
-    Cumulative return since January 1, {LIVE_YEAR}. <span style="color:#06b6d4;font-weight:700">Cyan line = Iberic Centinel.</span>
+    Cumulative return since January 1, {LIVE_YEAR}. <span style="color:#06b6d4;font-weight:700">Cyan line = Iberic Centinela.</span>
   </div>
 
   <div style="margin-top:24px">
@@ -1532,14 +1532,14 @@ body {{ font-family: 'Inter', -apple-system, sans-serif; background:#0f172a; col
   </div>
 
   <div class="footer">
-    <span>SFinance-alicIA | Iberic Centinel LIVE | UCITS compliant | For informational purposes only, not financial advice</span>
+    <span>SFinance-alicIA | Iberic Centinela LIVE | UCITS compliant | For informational purposes only, not financial advice</span>
     <span>Signal: {dates_live[-1].strftime("%Y-%m-%d")} | {n_positions} positions | {N_live} NAV days | SMA200 min {MIN_EXPOSURE:.0%}</span>
   </div>
 
   </div>
 
   <div id="tab-backtest" class="tab-panel">
-    <iframe class="backtest-frame" id="backtest-iframe" data-src="Iberic_Centinel_Backtest.html"></iframe>
+    <iframe class="backtest-frame" id="backtest-iframe" data-src="Iberic_Centinela_Backtest.html"></iframe>
   </div>
 
 </div>
@@ -1561,7 +1561,7 @@ function switchTab(idx) {{
 # ═══════════════════════════════════════════════════════════════════
 # 11. OUTPUT
 # ═══════════════════════════════════════════════════════════════════
-outpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Iberic_Centinel_Live.html")
+outpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Iberic_Centinela_Live.html")
 with open(outpath, "w", encoding="utf-8") as f:
     f.write(html)
 print(f"\n  Report saved: {outpath}")
@@ -1739,7 +1739,7 @@ def build_daily_email_html():
         </table></div>'''
 
     return f"""<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:24px;border-radius:8px">
-        <h2 style="color:#06b6d4;margin-bottom:4px">Iberic Centinel — Dual SMA (UCITS)</h2>
+        <h2 style="color:#06b6d4;margin-bottom:4px">Iberic Centinela — Dual SMA (UCITS)</h2>
         <p style="font-size:11px;color:#64748b;margin-bottom:16px">{TODAY.strftime("%Y-%m-%d")} | Post-close</p>
 
         <div style="background:#0f172a;padding:16px;border-radius:6px;margin-bottom:16px">
@@ -1763,7 +1763,7 @@ def build_daily_email_html():
         <h3 style="color:#94a3b8;font-size:12px;text-transform:uppercase;margin:16px 0 8px">vs Benchmarks YTD</h3>
         {bench_html}
 
-        <p style="margin-top:20px;font-size:10px;color:#475569">SFinance-alicIA | Iberic Centinel Dual SMA (UCITS) | {TODAY.strftime("%Y-%m-%d")}</p>
+        <p style="margin-top:20px;font-size:10px;color:#475569">SFinance-alicIA | Iberic Centinela Dual SMA (UCITS) | {TODAY.strftime("%Y-%m-%d")}</p>
     </div>"""
 
 def send_daily_email():
@@ -1772,14 +1772,14 @@ def send_daily_email():
         print("  ! GMAIL_APP_PASSWORD not set — skipping email")
         return False
     if sma50_new_exits:
-        subject = f"ACTION — SELL {', '.join(sma50_new_exits)} → {shy_ucits} | Iberic Centinel | {TODAY}"
+        subject = f"ACTION — SELL {', '.join(sma50_new_exits)} → {shy_ucits} | Iberic Centinela | {TODAY}"
     elif sma50_new_entries:
-        subject = f"ACTION — BUY {', '.join(sma50_new_entries)} ← {shy_ucits} | Iberic Centinel | {TODAY}"
+        subject = f"ACTION — BUY {', '.join(sma50_new_entries)} ← {shy_ucits} | Iberic Centinela | {TODAY}"
     elif is_new_rebalancing():
         month_names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-        subject = f"Iberic Centinel — Rebalance {month_names[last_rebal['date'].month-1]} | NAV ${nav_live[-1]:,.0f} | {TODAY}"
+        subject = f"Iberic Centinela — Rebalance {month_names[last_rebal['date'].month-1]} | NAV ${nav_live[-1]:,.0f} | {TODAY}"
     else:
-        subject = f"Iberic Centinel — NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}% | {TODAY}"
+        subject = f"Iberic Centinela — NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}% | {TODAY}"
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = GMAIL_SENDER
