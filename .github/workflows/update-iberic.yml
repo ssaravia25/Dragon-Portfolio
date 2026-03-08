@@ -75,7 +75,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase
           git add Iberic_Centinel_Backtest.html Iberic_Centinel_Live.html last_rebal_iberic.json
           git diff --staged --quiet || git commit -m "Iberic Centinel update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git pull --rebase
           git push
