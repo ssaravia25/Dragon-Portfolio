@@ -1,0 +1,81 @@
+name: Iberic Centinel Daily Update
+
+on:
+  schedule:
+    - cron: '5 18 * * 1-5'    # 14:05 ET (EDT, Mar-Nov) — pre-close alert
+    - cron: '5 19 * * 1-5'    # 15:05 ET (EDT, Mar-Nov) — post-close full run
+    - cron: '5 19 * * 1-5'    # 14:05 ET (EST, Nov-Mar) — pre-close alert
+    - cron: '5 20 * * 1-5'    # 15:05 ET (EST, Nov-Mar) — post-close full run
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  update-iberic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine run mode (pre-close alert vs full run)
+        id: timecheck
+        run: |
+          NY_HOUR=$(TZ=America/New_York date +%H)
+          echo "NY hour: $NY_HOUR"
+          if [ "$GITHUB_EVENT_NAME" == "schedule" ]; then
+            if [ "$NY_HOUR" == "14" ]; then
+              echo "skip=false" >> $GITHUB_OUTPUT
+              echo "mode=alert" >> $GITHUB_OUTPUT
+              echo "Mode: pre-close alert (2pm NY)"
+            elif [ "$NY_HOUR" == "15" ]; then
+              echo "skip=false" >> $GITHUB_OUTPUT
+              echo "mode=full" >> $GITHUB_OUTPUT
+              echo "Mode: full run (3pm NY)"
+            else
+              echo "skip=true" >> $GITHUB_OUTPUT
+              echo "mode=skip" >> $GITHUB_OUTPUT
+              echo "Skipping: not 2pm or 3pm NY"
+            fi
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "mode=full" >> $GITHUB_OUTPUT
+            echo "Mode: manual trigger (full run)"
+          fi
+
+      - name: Checkout
+        if: steps.timecheck.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: steps.timecheck.outputs.skip != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        if: steps.timecheck.outputs.skip != 'true'
+        run: pip install -r requirements.txt
+
+      - name: Delete price cache (force fresh data)
+        if: steps.timecheck.outputs.skip != 'true'
+        run: rm -f price_cache_iberic.json
+
+      - name: Run Iberic_Centinel.py (backtest, full run only)
+        if: steps.timecheck.outputs.skip != 'true' && steps.timecheck.outputs.mode == 'full'
+        run: python Iberic_Centinel.py
+
+      - name: Run Iberic_Centinel_Live.py (live dashboard + email)
+        if: steps.timecheck.outputs.skip != 'true'
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_MODE: ${{ steps.timecheck.outputs.mode == 'alert' && '1' || '' }}
+        run: python Iberic_Centinel_Live.py
+
+      - name: Commit updated reports (full run only)
+        if: steps.timecheck.outputs.skip != 'true' && steps.timecheck.outputs.mode == 'full'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase
+          git add Iberic_Centinel_Backtest.html Iberic_Centinel_Live.html last_rebal_iberic.json
+          git diff --staged --quiet || git commit -m "Iberic Centinel update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
