@@ -12,6 +12,7 @@ import numpy as np
 import datetime, os, math, json, smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email_recipients import get_recipients
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. CONFIG
@@ -47,10 +48,7 @@ ALERT_MODE = os.environ.get("ALERT_MODE") == "1"
 
 # ── Email config ──
 GMAIL_SENDER = "sgseaux@gmail.com"
-EMAIL_RECIPIENTS = [
-    "anremar@gmail.com",
-    "sergiosar@gmail.com",
-]
+EMAIL_RECIPIENTS = get_recipients("Iberic")
 
 W_DRAGON = {"Equity": 0.24, "Bonds": 0.18, "HardAssets": 0.19, "LongVol": 0.21, "CmdtyTrend": 0.18}
 W_6040 = {"Equity": 0.60, "Bonds": 0.40}

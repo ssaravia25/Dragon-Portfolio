@@ -67,6 +67,7 @@ jobs:
         if: steps.timecheck.outputs.skip != 'true'
         env:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
           ALERT_MODE: ${{ steps.timecheck.outputs.mode == 'alert' && '1' || '' }}
         run: python Iberic_Centinel_Live.py
 
