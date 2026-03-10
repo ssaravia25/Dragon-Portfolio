@@ -761,16 +761,17 @@ if ALERT_MODE:
             <p style="font-size:10px;color:#475569">SFinance-alicIA | Iberic Centinela Dual SMA</p>
         </div>"""
 
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = GMAIL_SENDER
-        msg["To"] = GMAIL_SENDER
-        msg.attach(MIMEText(html_body, "html"))
         try:
             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
                 server.login(GMAIL_SENDER, gmail_pass)
-                server.sendmail(GMAIL_SENDER, EMAIL_RECIPIENTS, msg.as_string())
-            print(f"  Pre-close email sent to {len(EMAIL_RECIPIENTS)} recipients (BCC)")
+                for rcpt in EMAIL_RECIPIENTS:
+                    msg = MIMEMultipart("alternative")
+                    msg["Subject"] = subject
+                    msg["From"] = GMAIL_SENDER
+                    msg["To"] = rcpt
+                    msg.attach(MIMEText(html_body, "html"))
+                    server.sendmail(GMAIL_SENDER, [rcpt], msg.as_string())
+            print(f"  Pre-close email sent to {len(EMAIL_RECIPIENTS)} recipients (individual BCC)")
         except Exception as e:
             print(f"  ! Email error: {e}")
     else:
@@ -1778,16 +1779,18 @@ def send_daily_email():
         subject = f"Iberic Centinela — Rebalance {month_names[last_rebal['date'].month-1]} | NAV ${nav_live[-1]:,.0f} | {TODAY}"
     else:
         subject = f"Iberic Centinela — NAV ${nav_live[-1]:,.0f} | YTD {ytd_ret:+.1f}% | {TODAY}"
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = GMAIL_SENDER
-    msg["To"] = GMAIL_SENDER
-    msg.attach(MIMEText(build_daily_email_html(), "html"))
+    html_body = build_daily_email_html()
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_SENDER, gmail_pass)
-            server.sendmail(GMAIL_SENDER, EMAIL_RECIPIENTS, msg.as_string())
-        print(f"  Email sent to {len(EMAIL_RECIPIENTS)} recipients (BCC)")
+            for rcpt in EMAIL_RECIPIENTS:
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = subject
+                msg["From"] = GMAIL_SENDER
+                msg["To"] = rcpt
+                msg.attach(MIMEText(html_body, "html"))
+                server.sendmail(GMAIL_SENDER, [rcpt], msg.as_string())
+        print(f"  Email sent to {len(EMAIL_RECIPIENTS)} recipients (individual BCC)")
         return True
     except Exception as e:
         print(f"  ! Email error: {e}")
