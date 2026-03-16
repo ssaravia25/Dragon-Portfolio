@@ -11,16 +11,20 @@ FALLBACK = {
     "Dragon": [
         "sergiosar@gmail.com",
         "sergio@kobo.cl",
-        "alvaro@kobo.cl",
         "ianmcharboe@gmail.com",
         "nanogarcia@gmail.com",
         "jcarrasco@zinvestments.cl",
         "thomasbertiez@gmail.com",
         "anremar@gmail.com",
+        "hartostudio@gmail.com",
+        "dagremler@gmail.com",
+        "nuriahartos@gmail.com",
+        "carlosmunizagab@gmail.com",
     ],
     "Iberic": [
         "anremar@gmail.com",
         "sergiosar@gmail.com",
+        "hartostudio@gmail.com",
     ],
 }
 
@@ -44,3 +48,29 @@ def get_recipients(sheet_name: str) -> list[str]:
     except Exception as e:
         print(f"  ! Google Sheets error: {e} — using fallback")
         return FALLBACK.get(sheet_name, [])
+
+
+def get_whatsapp_recipients() -> list[dict]:
+    """Lee destinatarios WhatsApp de la pestaña 'WhatsApp' del Google Sheet.
+    Devuelve lista de {'name': str, 'phone': str, 'apikey': str}."""
+    creds_json = os.environ.get("GOOGLE_SHEETS_CREDENTIALS")
+    if not creds_json:
+        print("  ! GOOGLE_SHEETS_CREDENTIALS not set — skipping WhatsApp")
+        return []
+
+    try:
+        creds = Credentials.from_service_account_info(
+            json.loads(creds_json), scopes=SCOPES
+        )
+        gc = gspread.authorize(creds)
+        ws = gc.open_by_key(SPREADSHEET_ID).worksheet("WhatsApp")
+        rows = ws.get_all_records()
+        recipients = [
+            {"name": r.get("Name", ""), "phone": str(r.get("Phone", "")), "apikey": str(r.get("ApiKey", ""))}
+            for r in rows if r.get("Phone") and r.get("ApiKey")
+        ]
+        print(f"  Loaded {len(recipients)} WhatsApp recipients from Google Sheets")
+        return recipients
+    except Exception as e:
+        print(f"  ! WhatsApp Sheet error: {e}")
+        return []
